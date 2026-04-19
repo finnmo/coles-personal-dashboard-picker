@@ -1,0 +1,41 @@
+name: E2E Tests
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  e2e:
+    name: Playwright E2E
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: file:./data/e2e.db
+      SESSION_SECRET: e2e-test-session-secret-32-chars-min
+      APP_PASSWORD_HASH: ${{ secrets.TEST_PASSWORD_HASH }}
+      LIST_PROVIDER: apple_reminders
+      APPLE_SHORTCUTS_NAME: TestShortcut
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npx prisma generate
+      - run: mkdir -p data
+      - run: npx prisma migrate deploy
+      - run: npm run build
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+      - name: Start app
+        run: npm start &
+      - name: Wait for app
+        run: npx wait-on http://localhost:3000/api/health --timeout 30000
+      - name: Run E2E tests
+        run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

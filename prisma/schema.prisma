@@ -1,0 +1,25 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// store is constrained to "COLES" | "IGA" in application code (SQLite has no enum support)
+model Product {
+  id                     String    @id @default(cuid())
+  name                   String
+  imageUrl               String?
+  store                  String
+  colesProductId         String?   @unique
+  igaProductId           String?   @unique
+  repurchaseIntervalDays Int       @default(14)
+  lastPurchasedAt        DateTime?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  @@index([store])
+  @@index([lastPurchasedAt])
+}
