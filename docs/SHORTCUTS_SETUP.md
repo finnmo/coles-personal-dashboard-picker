@@ -1,52 +1,90 @@
 # Apple Shortcuts Setup
 
-The dashboard sends items to your shared Apple Reminders list via a Shortcut. This is a one-time setup on the iPad.
+The dashboard sends grocery items to your shared Apple Reminders list via an iOS Shortcut. This is a one-time setup on the iPad (or iPhone).
 
-## Step 1: Create the Shortcut
+## What the dashboard sends
+
+When you tap the purchase button, the app opens a URL of this form:
+
+```
+shortcuts://run-shortcut?name=AddToShopping&input={"name":"Full Cream Milk 2L","store":"COLES"}
+```
+
+Your Shortcut receives the JSON payload and adds the product name as a new Reminder.
+
+---
+
+## Step 1 — Create the Shortcut
 
 1. Open the **Shortcuts** app on your iPad
 2. Tap **+** to create a new shortcut
 3. Tap the shortcut name at the top and rename it to exactly: **`AddToShopping`**
-   _(or whatever you set `APPLE_SHORTCUTS_NAME` to in your `.env`)_
 
-## Step 2: Add Actions
+   > The name must match `APPLE_SHORTCUTS_NAME` in your `.env` exactly (case-sensitive).
 
-Add these actions in order:
+---
 
-1. **Get Shortcut Input**
-   - This receives the JSON sent by the dashboard
+## Step 2 — Add Actions
 
-2. **Get Dictionary from Input**
-   - Input: Shortcut Input
+Add these five actions in order:
 
-3. **Get Value for Key in Dictionary**
-   - Dictionary: Dictionary (from step 2)
-   - Key: `item`
+### Action 1 — Receive Shortcut Input
 
-4. **Add New Reminder**
-   - Reminder: Value (from step 3)
-   - List: _(select your shared household Reminders list)_
+- Search for **"Receive Shortcut Input"**
+- Input type: **Text**
 
-## Step 3: Test the Shortcut
+### Action 2 — Get Dictionary from Input
 
-In a browser on the iPad, open:
+- Search for **"Get Dictionary from Input"**
+- Input: **Shortcut Input** (the variable from Action 1)
+
+### Action 3 — Get Value for Key
+
+- Search for **"Get Value for Key in Dictionary"**
+- Dictionary: **Dictionary** (the variable from Action 2)
+- Key: **`name`**
+
+### Action 4 — Add New Reminder
+
+- Search for **"Add New Reminder"**
+- Reminder: **Value** (the variable from Action 3)
+- List: _select your shared household Reminders list_
+
+### Action 5 (optional) — Show Result
+
+- Search for **"Show Result"**
+- Input: `Done — added to shopping list`
+- This confirms to the user that the item was added.
+
+---
+
+## Step 3 — Test the Shortcut
+
+In Safari on the iPad, navigate to:
 
 ```
-shortcuts://run-shortcut?name=AddToShopping&input=%7B%22item%22%3A%22Test%20Item%22%2C%22store%22%3A%22Coles%22%7D
+shortcuts://run-shortcut?name=AddToShopping&input=%7B%22name%22%3A%22Test%20Milk%22%2C%22store%22%3A%22COLES%22%7D
 ```
 
-You should see "Test Item" appear in your Reminders list.
+You should see "Test Milk" appear in your shared Reminders list.
 
-## Step 4: Allow Background Execution
+---
 
-- Open **Settings → Shortcuts**
-- Enable **Allow Untrusted Shortcuts** (if not already)
-- In the Shortcuts app, open your shortcut settings and ensure it can run without confirmation
+## Step 4 — Allow Untrusted Shortcuts (if prompted)
+
+1. Open **Settings → Shortcuts**
+2. Enable **Allow Untrusted Shortcuts**
+3. In the Shortcuts app, open your shortcut → tap the **•••** menu → **Shortcut Details**
+4. Disable **"Ask Before Running"** so the shortcut runs silently in the background
+
+---
 
 ## Troubleshooting
 
-**Shortcut doesn't open**: Ensure the `APPLE_SHORTCUTS_NAME` in `.env` matches the shortcut name exactly (case-sensitive).
-
-**Reminder doesn't appear**: Check that step 4 "Add New Reminder" has the correct list selected (not the default Reminders list).
-
-**Shortcut asks for confirmation each time**: In Shortcuts app, tap the shortcut → tap the share icon → "Add to Home Screen" — shortcuts added to home screen run without prompting.
+| Symptom                                   | Fix                                                                                                                |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Shortcut doesn't open                     | Check that `APPLE_SHORTCUTS_NAME` in `.env` matches the shortcut name exactly (case-sensitive, no trailing spaces) |
+| Reminder doesn't appear                   | Verify Action 4 has the correct list selected — not the default personal Reminders list                            |
+| Shortcut asks for confirmation every time | Disable "Ask Before Running" in Shortcut Details (Step 4)                                                          |
+| Wrong item name added                     | Confirm Action 3 uses key **`name`** (not `item` or `product`)                                                     |
+| App shows "List provider unavailable"     | Check that `LIST_PROVIDER=apple_reminders` and `APPLE_SHORTCUTS_NAME` are set in `.env` and restart the container  |

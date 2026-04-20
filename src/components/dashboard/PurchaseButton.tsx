@@ -17,17 +17,33 @@ export function PurchaseButton({ productId, onSuccess }: PurchaseButtonProps) {
     setState('loading')
 
     try {
-      const res = await fetch(`/api/products/${productId}/purchase`, {
+      // Mark as purchased in DB
+      const purchaseRes = await fetch(`/api/products/${productId}/purchase`, {
         method: 'POST',
       })
-
-      if (res.ok) {
-        setState('done')
-        onSuccess?.()
-        setTimeout(() => setState('idle'), 2000)
-      } else {
+      if (!purchaseRes.ok) {
         setState('idle')
+        return
       }
+
+      // Add to household list (Apple Reminders or Google Tasks)
+      const listRes = await fetch('/api/list/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId }),
+      })
+
+      if (listRes.ok) {
+        const data = await listRes.json()
+        // Apple Reminders: open the Shortcuts URL on the device
+        if (data.redirectUrl) {
+          window.location.href = data.redirectUrl
+        }
+      }
+
+      setState('done')
+      onSuccess?.()
+      setTimeout(() => setState('idle'), 2000)
     } catch {
       setState('idle')
     }
