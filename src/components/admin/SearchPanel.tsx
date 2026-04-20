@@ -36,7 +36,9 @@ export function SearchPanel({ store, onAdd, existingIds }: SearchPanelProps) {
           data-testid="admin-search-input"
         />
         {isLoading && (
-          <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground" />
+          <div className="absolute right-3 top-1/2 -translate-y-1/2">
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+          </div>
         )}
       </div>
 

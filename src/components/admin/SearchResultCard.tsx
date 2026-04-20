@@ -1,7 +1,8 @@
 'use client'
 
+import { useState } from 'react'
 import Image from 'next/image'
-import { Plus, Check } from 'lucide-react'
+import { Plus, Check, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { ColesSearchResult } from '@/lib/coles-api'
 
@@ -12,6 +13,18 @@ interface SearchResultCardProps {
 }
 
 export function SearchResultCard({ result, alreadyAdded, onAdd }: SearchResultCardProps) {
+  const [isAdding, setIsAdding] = useState(false)
+
+  async function handleAdd() {
+    if (isAdding || alreadyAdded) return
+    setIsAdding(true)
+    try {
+      await onAdd()
+    } finally {
+      setIsAdding(false)
+    }
+  }
+
   return (
     <div
       className="flex items-center gap-3 rounded-lg border border-border bg-card p-3"
@@ -45,12 +58,18 @@ export function SearchResultCard({ result, alreadyAdded, onAdd }: SearchResultCa
       <Button
         variant={alreadyAdded ? 'ghost' : 'primary'}
         size="sm"
-        disabled={alreadyAdded}
-        onClick={onAdd}
+        disabled={alreadyAdded || isAdding}
+        onClick={handleAdd}
         data-testid={`add-btn-${result.colesProductId}`}
         aria-label={alreadyAdded ? 'Already added' : `Add ${result.name}`}
       >
-        {alreadyAdded ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+        {isAdding ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : alreadyAdded ? (
+          <Check className="h-4 w-4" />
+        ) : (
+          <Plus className="h-4 w-4" />
+        )}
       </Button>
     </div>
   )
