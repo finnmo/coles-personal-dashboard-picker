@@ -30,28 +30,19 @@ function extractProductId(url: string): string {
   return match ? match[1] : ''
 }
 
+export function colesProductImageUrl(colesProductId: string): string {
+  // Coles CDN pattern: productimages/{first digit of id}/{id}.jpg
+  const firstChar = colesProductId[0] ?? '0'
+  return `https://cdn.productimages.coles.com.au/productimages/${firstChar}/${colesProductId}.jpg`
+}
+
 export async function fetchColesProductImage(colesProductId: string): Promise<string> {
-  const url = `https://www.coles.com.au/product/${colesProductId}`
-  const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), 5000)
+  const url = colesProductImageUrl(colesProductId)
   try {
-    const response = await fetch(url, {
-      signal: controller.signal,
-      headers: {
-        'User-Agent':
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        Accept: 'text/html',
-      },
-      cache: 'no-store',
-    })
-    if (!response.ok) return ''
-    const html = await response.text()
-    const match = html.match(/<meta[^>]+property="og:image"[^>]+content="([^"]+)"/)
-    return match ? match[1] : ''
+    const res = await fetch(url, { method: 'HEAD', cache: 'no-store' })
+    return res.ok ? url : ''
   } catch {
     return ''
-  } finally {
-    clearTimeout(timeout)
   }
 }
 
