@@ -7,5 +7,4 @@ if (!password) {
   process.exit(1)
 }
 
-const hash = await bcrypt.hash(password, 10)
-console.log(hash)
+bcrypt.hash(password, 10).then((hash) => console.log(hash))
