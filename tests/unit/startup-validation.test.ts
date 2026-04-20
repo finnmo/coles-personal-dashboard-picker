@@ -1,0 +1,153 @@
+// @vitest-environment node
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { validateEnv, assertValidEnv } from '@/lib/startup-validation'
+
+const VALID_BASE = {
+  DATABASE_URL: 'file:./data/test.db',
+  SESSION_SECRET: 'test-secret-that-is-at-least-32-characters',
+  APP_PASSWORD_HASH: '$2b$10$somehash',
+  LIST_PROVIDER: 'apple_reminders',
+  APPLE_SHORTCUTS_NAME: 'TestShortcut',
+}
+
+function setEnv(overrides: Record<string, string | undefined>) {
+  Object.assign(process.env, VALID_BASE)
+  for (const [key, value] of Object.entries(overrides)) {
+    if (value === undefined) {
+      delete process.env[key]
+    } else {
+      process.env[key] = value
+    }
+  }
+}
+
+function clearEnv() {
+  for (const key of Object.keys(VALID_BASE)) {
+    delete process.env[key]
+  }
+  delete process.env.GOOGLE_CLIENT_ID
+  delete process.env.GOOGLE_CLIENT_SECRET
+  delete process.env.GOOGLE_REFRESH_TOKEN
+  delete process.env.GOOGLE_TASK_LIST_ID
+}
+
+describe('validateEnv', () => {
+  beforeEach(clearEnv)
+  afterEach(clearEnv)
+
+  it('returns valid when all required vars are present (apple_reminders)', () => {
+    setEnv({})
+    expect(validateEnv()).toEqual({ valid: true })
+  })
+
+  it('returns valid for google_tasks with all Google vars set', () => {
+    setEnv({
+      LIST_PROVIDER: 'google_tasks',
+      APPLE_SHORTCUTS_NAME: undefined,
+      GOOGLE_CLIENT_ID: 'id',
+      GOOGLE_CLIENT_SECRET: 'secret',
+      GOOGLE_REFRESH_TOKEN: 'token',
+      GOOGLE_TASK_LIST_ID: 'list-id',
+    })
+    expect(validateEnv()).toEqual({ valid: true })
+  })
+
+  it('errors when DATABASE_URL is missing', () => {
+    setEnv({ DATABASE_URL: undefined })
+    const result = validateEnv()
+    expect(result.valid).toBe(false)
+    if (!result.valid) expect(result.errors).toContain('DATABASE_URL is required')
+  })
+
+  it('errors when SESSION_SECRET is missing', () => {
+    setEnv({ SESSION_SECRET: undefined })
+    const result = validateEnv()
+    expect(result.valid).toBe(false)
+    if (!result.valid) expect(result.errors.some((e) => e.includes('SESSION_SECRET'))).toBe(true)
+  })
+
+  it('errors when SESSION_SECRET is shorter than 32 chars', () => {
+    setEnv({ SESSION_SECRET: 'tooshort' })
+    const result = validateEnv()
+    expect(result.valid).toBe(false)
+    if (!result.valid) expect(result.errors.some((e) => e.includes('32 characters'))).toBe(true)
+  })
+
+  it('errors when APP_PASSWORD_HASH is missing', () => {
+    setEnv({ APP_PASSWORD_HASH: undefined })
+    const result = validateEnv()
+    expect(result.valid).toBe(false)
+    if (!result.valid) expect(result.errors.some((e) => e.includes('APP_PASSWORD_HASH'))).toBe(true)
+  })
+
+  it('errors when LIST_PROVIDER is missing', () => {
+    setEnv({ LIST_PROVIDER: undefined })
+    const result = validateEnv()
+    expect(result.valid).toBe(false)
+    if (!result.valid) expect(result.errors.some((e) => e.includes('LIST_PROVIDER'))).toBe(true)
+  })
+
+  it('errors when LIST_PROVIDER is an invalid value', () => {
+    setEnv({ LIST_PROVIDER: 'telegram' })
+    const result = validateEnv()
+    expect(result.valid).toBe(false)
+    if (!result.valid) expect(result.errors.some((e) => e.includes('"telegram"'))).toBe(true)
+  })
+
+  it('errors when apple_reminders is set but APPLE_SHORTCUTS_NAME is missing', () => {
+    setEnv({ LIST_PROVIDER: 'apple_reminders', APPLE_SHORTCUTS_NAME: undefined })
+    const result = validateEnv()
+    expect(result.valid).toBe(false)
+    if (!result.valid)
+      expect(result.errors.some((e) => e.includes('APPLE_SHORTCUTS_NAME'))).toBe(true)
+  })
+
+  it('errors when google_tasks is set but Google vars are missing', () => {
+    setEnv({ LIST_PROVIDER: 'google_tasks', APPLE_SHORTCUTS_NAME: undefined })
+    const result = validateEnv()
+    expect(result.valid).toBe(false)
+    if (!result.valid) expect(result.errors.some((e) => e.includes('GOOGLE_CLIENT_ID'))).toBe(true)
+  })
+
+  it('returns multiple errors at once', () => {
+    clearEnv()
+    const result = validateEnv()
+    expect(result.valid).toBe(false)
+    if (!result.valid) expect(result.errors.length).toBeGreaterThan(2)
+  })
+})
+
+describe('assertValidEnv', () => {
+  beforeEach(clearEnv)
+  afterEach(clearEnv)
+
+  it('does not throw when env is valid', () => {
+    setEnv({})
+    expect(() => assertValidEnv()).not.toThrow()
+  })
+
+  it('throws a descriptive error when env is invalid', () => {
+    setEnv({ DATABASE_URL: undefined })
+    expect(() => assertValidEnv()).toThrow('DATABASE_URL is required')
+  })
+
+  it('thrown error contains the config box header', () => {
+    setEnv({ DATABASE_URL: undefined })
+    expect(() => assertValidEnv()).toThrow('Configuration Error')
+  })
+
+  it('logs a warning for google_keep and still validates', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    setEnv({
+      LIST_PROVIDER: 'google_keep',
+      APPLE_SHORTCUTS_NAME: undefined,
+      GOOGLE_CLIENT_ID: 'id',
+      GOOGLE_CLIENT_SECRET: 'secret',
+      GOOGLE_REFRESH_TOKEN: 'token',
+      GOOGLE_TASK_LIST_ID: 'list-id',
+    })
+    assertValidEnv()
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('google_keep'))
+    warn.mockRestore()
+  })
+})

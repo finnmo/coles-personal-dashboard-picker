@@ -38,5 +38,6 @@ Thumbs.db
 *.log
 npm-debug.log*
 
-# Prisma
-prisma/migrations/
+# Prisma — migrations are committed; only ignore local dev overrides
+prisma/dev.db
+prisma/dev.db-journal
