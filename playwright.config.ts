@@ -22,9 +22,18 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run start',
+    command: process.env.CI ? 'node .next/standalone/server.js' : 'npm run dev',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
+    env: process.env.CI
+      ? {
+          DATABASE_URL: process.env.DATABASE_URL ?? '',
+          APP_PASSWORD_HASH: process.env.APP_PASSWORD_HASH ?? '',
+          SESSION_SECRET: process.env.SESSION_SECRET ?? '',
+          LIST_PROVIDER: process.env.LIST_PROVIDER ?? 'apple_reminders',
+          APPLE_SHORTCUTS_NAME: process.env.APPLE_SHORTCUTS_NAME ?? '',
+        }
+      : {},
   },
 })
