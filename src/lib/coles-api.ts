@@ -17,48 +17,34 @@ export class ColesApiError extends Error {
   }
 }
 
-function getConfig() {
-  return {
-    baseUrl: process.env.COLES_API_BASE_URL ?? 'https://api.coles.com.au',
-    userAgent:
-      process.env.COLES_API_USER_AGENT ??
-      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
-  }
+type RapidApiResult = {
+  product_name: string
+  product_brand: string | null
+  current_price: number | null
+  product_size: string | null
+  url: string
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function normalizeProduct(raw: any): ColesSearchResult {
-  return {
-    colesProductId: String(raw.id ?? raw.stockcode ?? raw.productId ?? ''),
-    name: String(raw.name ?? raw.displayName ?? ''),
-    imageUrl: String(
-      raw.imageUris?.find((u: { type: string }) => u.type === 'product-image-large')?.uri ??
-        raw.imageUris?.[0]?.uri ??
-        raw.imageUrl ??
-        ''
-    ),
-    brand: raw.brand ? String(raw.brand) : null,
-    packageSize: raw.size ? String(raw.size) : null,
-    price: raw.pricing?.now != null ? Number(raw.pricing.now) : null,
-  }
+function extractProductId(url: string): string {
+  const match = url.match(/\/product\/(\d+)/)
+  return match ? match[1] : ''
 }
 
 export async function searchProducts(query: string): Promise<ColesSearchResult[]> {
-  const { baseUrl, userAgent } = getConfig()
-  const url = new URL(`${baseUrl}/api/2.0/page/products/search`)
-  url.searchParams.set('q', query)
-  url.searchParams.set('pageSize', '20')
-  url.searchParams.set('pageNumber', '1')
+  const apiKey = process.env.RAPIDAPI_KEY
+  if (!apiKey) throw new ColesApiError('RAPIDAPI_KEY is not configured', 0)
+
+  const url = new URL('https://coles-product-price-api.p.rapidapi.com/coles/product-search/')
+  url.searchParams.set('query', query)
 
   let response: Response
   try {
     response = await fetch(url.toString(), {
       headers: {
-        'User-Agent': userAgent,
-        Accept: 'application/json',
-        'Accept-Language': 'en-AU,en;q=0.9',
+        'Content-Type': 'application/json',
+        'x-rapidapi-host': 'coles-product-price-api.p.rapidapi.com',
+        'x-rapidapi-key': apiKey,
       },
-      // Prevent Next.js from caching external API calls
       cache: 'no-store',
     })
   } catch (cause) {
@@ -69,20 +55,21 @@ export async function searchProducts(query: string): Promise<ColesSearchResult[]
     throw new ColesApiError(`Coles API responded with ${response.status}`, response.status)
   }
 
-  let body: unknown
+  let body: { results?: RapidApiResult[] }
   try {
     body = await response.json()
   } catch {
     throw new ColesApiError('Coles API returned non-JSON response', response.status)
   }
 
-  // The Coles API nests results under different keys depending on the endpoint version
-  const raw = body as Record<string, unknown>
-  const results: unknown[] =
-    (raw.results as unknown[]) ??
-    (raw.products as unknown[]) ??
-    ((raw.catalogGroupView as Record<string, unknown>)?.catalogEntryView as unknown[]) ??
-    []
-
-  return results.map(normalizeProduct).filter((p) => p.colesProductId && p.name)
+  return (body.results ?? [])
+    .map((r) => ({
+      colesProductId: extractProductId(r.url),
+      name: r.product_name,
+      imageUrl: '',
+      brand: r.product_brand ?? null,
+      packageSize: r.product_size ?? null,
+      price: r.current_price ?? null,
+    }))
+    .filter((p) => p.colesProductId && p.name)
 }
