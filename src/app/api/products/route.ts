@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { computePriority } from '@/lib/priority'
+import { fetchColesProductImage } from '@/lib/coles-api'
 import type { EnrichedProduct, Store } from '@/types/product'
 
 const VALID_STORES: Store[] = ['COLES', 'IGA']
@@ -82,12 +83,20 @@ export async function POST(request: Request) {
   }
 
   try {
+    const resolvedColesId = typeof colesProductId === 'string' ? colesProductId : null
+    const resolvedImageUrl =
+      typeof imageUrl === 'string' && imageUrl
+        ? imageUrl
+        : resolvedColesId
+          ? await fetchColesProductImage(resolvedColesId)
+          : null
+
     const product = await db.product.create({
       data: {
         name,
-        imageUrl: typeof imageUrl === 'string' ? imageUrl : null,
+        imageUrl: resolvedImageUrl || null,
         store: String(store),
-        colesProductId: typeof colesProductId === 'string' ? colesProductId : null,
+        colesProductId: resolvedColesId,
         igaProductId: typeof igaProductId === 'string' ? igaProductId : null,
         repurchaseIntervalDays:
           typeof repurchaseIntervalDays === 'number' && repurchaseIntervalDays > 0

@@ -30,6 +30,26 @@ function extractProductId(url: string): string {
   return match ? match[1] : ''
 }
 
+export async function fetchColesProductImage(colesProductId: string): Promise<string> {
+  const url = `https://www.coles.com.au/product/${colesProductId}`
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        Accept: 'text/html',
+      },
+      cache: 'no-store',
+    })
+    if (!response.ok) return ''
+    const html = await response.text()
+    const match = html.match(/<meta[^>]+property="og:image"[^>]+content="([^"]+)"/)
+    return match ? match[1] : ''
+  } catch {
+    return ''
+  }
+}
+
 export async function searchProducts(query: string): Promise<ColesSearchResult[]> {
   const apiKey = process.env.RAPIDAPI_KEY
   if (!apiKey) throw new ColesApiError('RAPIDAPI_KEY is not configured', 0)
