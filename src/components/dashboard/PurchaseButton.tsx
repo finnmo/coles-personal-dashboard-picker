@@ -56,15 +56,15 @@ export function PurchaseButton({ productId, onSuccess }: PurchaseButtonProps) {
       data-testid={`purchase-btn-${productId}`}
       aria-label="Add to shopping list"
       className={clsx(
-        'flex h-10 w-10 items-center justify-center rounded-full transition-all duration-200',
+        'flex h-12 w-12 items-center justify-center rounded-full transition-all duration-150',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
         state === 'done'
           ? 'bg-green-500 text-white'
-          : 'bg-primary/10 text-primary hover:bg-primary hover:text-white active:scale-95',
-        state === 'loading' && 'opacity-60'
+          : 'bg-primary/10 text-primary active:bg-primary active:text-white active:scale-90',
+        state === 'loading' && 'opacity-50'
       )}
     >
-      {state === 'done' ? <Check className="h-5 w-5" /> : <ShoppingCart className="h-5 w-5" />}
+      {state === 'done' ? <Check className="h-6 w-6" /> : <ShoppingCart className="h-6 w-6" />}
     </button>
   )
 }

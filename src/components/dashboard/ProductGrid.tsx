@@ -21,18 +21,20 @@ export function ProductGrid({ store }: ProductGridProps) {
   return (
     <ProductFilter products={products}>
       {(filtered) => (
-        <div
-          className="grid grid-cols-2 gap-3 p-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
-          data-testid="product-grid"
-        >
+        <div className="overflow-y-auto flex-1">
           {filtered.length === 0 ? (
-            <p className="col-span-full py-8 text-center text-sm text-muted-foreground">
+            <p className="py-12 text-center text-base text-muted-foreground">
               No products match that filter.
             </p>
           ) : (
-            filtered.map((product) => (
-              <ProductTile key={product.id} product={product} onPurchased={() => mutate()} />
-            ))
+            <div
+              className="grid grid-cols-2 gap-3 p-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
+              data-testid="product-grid"
+            >
+              {filtered.map((product) => (
+                <ProductTile key={product.id} product={product} onPurchased={() => mutate()} />
+              ))}
+            </div>
           )}
         </div>
       )}

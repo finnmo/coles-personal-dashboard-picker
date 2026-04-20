@@ -20,12 +20,12 @@ export function TabNav() {
             href={`/dashboard/${tab}`}
             data-testid={`tab-${tab}`}
             className={clsx(
-              'relative -mb-px border-b-2 px-4 py-3 text-sm font-medium transition-colors',
+              'relative -mb-px border-b-2 px-6 py-4 text-base font-semibold transition-colors',
               active
                 ? tab === 'coles'
                   ? 'border-coles-red text-coles-red'
                   : 'border-iga-green text-iga-green'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
+                : 'border-transparent text-muted-foreground active:text-foreground'
             )}
             aria-current={active ? 'page' : undefined}
           >

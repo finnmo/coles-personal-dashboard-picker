@@ -16,7 +16,7 @@ export function Header() {
 
   return (
     <header className="flex h-14 items-center justify-between border-b border-border bg-card px-4">
-      <h1 className="text-base font-semibold text-foreground">Household Dashboard</h1>
+      <h1 className="text-lg font-bold tracking-tight text-foreground">Household Dashboard</h1>
       <div className="flex items-center gap-1">
         <ThemeToggle />
         <Button
@@ -25,6 +25,7 @@ export function Header() {
           onClick={handleLogout}
           aria-label="Sign out"
           data-testid="logout-button"
+          className="h-11 w-11"
         >
           <LogOut className="h-5 w-5" />
         </Button>

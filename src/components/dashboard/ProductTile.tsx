@@ -38,8 +38,8 @@ export function ProductTile({ product, onPurchased }: ProductTileProps) {
         </div>
       </div>
 
-      <div className="flex flex-1 items-end justify-between gap-2 p-3">
-        <p className="line-clamp-2 text-sm font-medium leading-tight text-foreground">
+      <div className="flex flex-1 items-end justify-between gap-2 p-3 pb-2">
+        <p className="line-clamp-2 text-sm font-semibold leading-snug text-foreground">
           {product.name}
         </p>
         <PurchaseButton productId={product.id} onSuccess={onPurchased} />

@@ -5,6 +5,15 @@ import type { EnrichedProduct } from '@/types/product'
 
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 
+function wordFirstLetters(name: string): Set<string> {
+  return new Set(
+    name
+      .split(/\s+/)
+      .map((w) => w[0]?.toUpperCase())
+      .filter(Boolean) as string[]
+  )
+}
+
 interface ProductFilterProps {
   products: EnrichedProduct[]
   children: (filtered: EnrichedProduct[]) => React.ReactNode
@@ -14,15 +23,18 @@ export function ProductFilter({ products, children }: ProductFilterProps) {
   const [activeLetter, setActiveLetter] = useState<string | null>(null)
   const [nameQuery, setNameQuery] = useState('')
 
-  const availableLetters = useMemo(
-    () => new Set(products.map((p) => p.name[0]?.toUpperCase()).filter(Boolean)),
-    [products]
-  )
+  const availableLetters = useMemo(() => {
+    const set = new Set<string>()
+    for (const p of products) {
+      for (const letter of wordFirstLetters(p.name)) set.add(letter)
+    }
+    return set
+  }, [products])
 
   const filtered = useMemo(() => {
     let result = products
     if (activeLetter) {
-      result = result.filter((p) => p.name[0]?.toUpperCase() === activeLetter)
+      result = result.filter((p) => wordFirstLetters(p.name).has(activeLetter))
     }
     if (nameQuery.trim()) {
       const q = nameQuery.trim().toLowerCase()
@@ -42,20 +54,9 @@ export function ProductFilter({ products, children }: ProductFilterProps) {
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      {/* Name search */}
-      <div className="px-4 pt-3">
-        <input
-          type="search"
-          placeholder="Filter by name…"
-          value={nameQuery}
-          onChange={(e) => handleQuery(e.target.value)}
-          className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-        />
-      </div>
-
-      {/* Letter picker */}
-      <div className="flex flex-wrap gap-1 px-4">
+    <div className="flex min-h-0 flex-1">
+      {/* Left letter sidebar */}
+      <div className="flex w-12 flex-col items-center gap-0.5 overflow-y-auto border-r border-border bg-card py-2">
         {LETTERS.map((letter) => {
           const available = availableLetters.has(letter)
           const active = activeLetter === letter
@@ -66,29 +67,33 @@ export function ProductFilter({ products, children }: ProductFilterProps) {
               disabled={!available}
               aria-pressed={active}
               className={[
-                'flex h-8 w-8 items-center justify-center rounded-md text-xs font-semibold transition-colors',
+                'flex h-9 w-9 items-center justify-center rounded-lg text-sm font-semibold transition-colors active:scale-90',
                 active
                   ? 'bg-primary text-primary-foreground'
                   : available
-                    ? 'bg-muted text-foreground hover:bg-muted/70'
-                    : 'cursor-default text-muted-foreground/30',
+                    ? 'text-foreground active:bg-muted'
+                    : 'cursor-default text-muted-foreground/25',
               ].join(' ')}
             >
               {letter}
             </button>
           )
         })}
-        {activeLetter && (
-          <button
-            onClick={() => setActiveLetter(null)}
-            className="flex h-8 items-center rounded-md px-2 text-xs text-muted-foreground hover:text-foreground"
-          >
-            Clear
-          </button>
-        )}
       </div>
 
-      {children(filtered)}
+      {/* Right content */}
+      <div className="flex min-w-0 flex-1 flex-col">
+        <div className="px-3 pt-3 pb-2">
+          <input
+            type="search"
+            placeholder="Filter by name…"
+            value={nameQuery}
+            onChange={(e) => handleQuery(e.target.value)}
+            className="h-11 w-full rounded-xl border border-border bg-background px-4 text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+        </div>
+        {children(filtered)}
+      </div>
     </div>
   )
 }
