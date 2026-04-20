@@ -2,10 +2,8 @@ import { clsx } from 'clsx'
 
 type BadgeVariant = 'overdue' | 'new' | 'default'
 
-interface BadgeProps {
+type BadgeProps = React.HTMLAttributes<HTMLSpanElement> & {
   variant?: BadgeVariant
-  children: React.ReactNode
-  className?: string
 }
 
 const variantClasses: Record<BadgeVariant, string> = {
@@ -14,7 +12,7 @@ const variantClasses: Record<BadgeVariant, string> = {
   default: 'bg-muted text-muted-foreground',
 }
 
-export function Badge({ variant = 'default', children, className }: BadgeProps) {
+export function Badge({ variant = 'default', children, className, ...props }: BadgeProps) {
   return (
     <span
       className={clsx(
@@ -22,6 +20,7 @@ export function Badge({ variant = 'default', children, className }: BadgeProps) 
         variantClasses[variant],
         className
       )}
+      {...props}
     >
       {children}
     </span>

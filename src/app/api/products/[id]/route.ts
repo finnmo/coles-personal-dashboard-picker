@@ -50,7 +50,10 @@ export async function PATCH(request: Request, { params }: Params) {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
   }
 
-  const { name, imageUrl, repurchaseIntervalDays } = body as Record<string, unknown>
+  const { name, imageUrl, repurchaseIntervalDays, lastPurchasedAt } = body as Record<
+    string,
+    unknown
+  >
 
   const product = await db.product.update({
     where: { id: params.id },
@@ -59,6 +62,9 @@ export async function PATCH(request: Request, { params }: Params) {
       ...(typeof imageUrl === 'string' ? { imageUrl } : {}),
       ...(typeof repurchaseIntervalDays === 'number' && repurchaseIntervalDays > 0
         ? { repurchaseIntervalDays }
+        : {}),
+      ...(typeof lastPurchasedAt === 'string'
+        ? { lastPurchasedAt: new Date(lastPurchasedAt) }
         : {}),
     },
   })
