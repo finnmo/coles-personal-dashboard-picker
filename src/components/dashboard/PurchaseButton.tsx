@@ -17,20 +17,13 @@ export function PurchaseButton({ productId, onSuccess }: PurchaseButtonProps) {
     setState('loading')
 
     try {
-      const res = await fetch(`/api/list/add`, {
+      const res = await fetch(`/api/products/${productId}/purchase`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productId }),
       })
 
       if (res.ok) {
-        const data = await res.json()
-        if (data.redirectUrl) {
-          window.location.href = data.redirectUrl
-        }
         setState('done')
         onSuccess?.()
-        // Reset after 2s so the button is usable again
         setTimeout(() => setState('idle'), 2000)
       } else {
         setState('idle')
