@@ -2,7 +2,7 @@ FROM node:20-alpine AS base
 
 # Stage 1: Install dependencies
 FROM base AS deps
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
 COPY package*.json ./
@@ -11,6 +11,7 @@ RUN npm ci --legacy-peer-deps
 
 # Stage 2: Build the application
 FROM base AS builder
+RUN apk add --no-cache openssl
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
