@@ -45,9 +45,12 @@ export async function POST(request: Request) {
   const expiryHours = parseInt(process.env.SESSION_EXPIRY_HOURS ?? '24', 10)
 
   const response = apiOk({ ok: true })
+  // Default to false — this app runs over plain HTTP on a LAN.
+  // Set SECURE_COOKIES=true only if you've terminated HTTPS upstream.
+  const secureCookie = process.env.SECURE_COOKIES === 'true'
   response.cookies.set('session', token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: secureCookie,
     sameSite: 'lax',
     maxAge: expiryHours * 60 * 60,
     path: '/',
