@@ -3,12 +3,24 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { Plus, Check, Loader2 } from 'lucide-react'
-import type { OffSearchResult } from '@/lib/off-api'
+import type { StoreSearchResult, Store } from '@/lib/store-search'
 
 interface SearchResultCardProps {
-  result: OffSearchResult
+  result: StoreSearchResult
   alreadyAdded: boolean
   onAdd: () => Promise<void>
+}
+
+const STORE_LABEL: Record<Store, string> = {
+  coles: 'Coles',
+  woolworths: 'Woolworths',
+  iga: 'IGA',
+}
+
+const STORE_CLASS: Record<Store, string> = {
+  coles: 'bg-red-600 text-white',
+  woolworths: 'bg-green-700 text-white',
+  iga: 'bg-blue-700 text-white',
 }
 
 export function SearchResultCard({ result, alreadyAdded, onAdd }: SearchResultCardProps) {
@@ -27,7 +39,7 @@ export function SearchResultCard({ result, alreadyAdded, onAdd }: SearchResultCa
   return (
     <div
       className="flex items-center gap-3 rounded-lg border border-border bg-card p-3"
-      data-testid={`search-result-${result.offProductId}`}
+      data-testid={`search-result-${result.externalId}`}
     >
       <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded bg-muted">
         {result.imageUrl ? (
@@ -45,16 +57,24 @@ export function SearchResultCard({ result, alreadyAdded, onAdd }: SearchResultCa
 
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium text-foreground">{result.name}</p>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
+          <span
+            className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${STORE_CLASS[result.store]}`}
+          >
+            {STORE_LABEL[result.store]}
+          </span>
           {result.brand && <span>{result.brand}</span>}
           {result.quantity && <span>{result.quantity}</span>}
+          {result.price != null && (
+            <span className="ml-auto font-medium text-foreground">${result.price.toFixed(2)}</span>
+          )}
         </div>
       </div>
 
       <button
         disabled={alreadyAdded || isAdding}
         onClick={handleAdd}
-        data-testid={`add-btn-${result.offProductId}`}
+        data-testid={`add-btn-${result.externalId}`}
         aria-label={alreadyAdded ? 'Already added' : `Add ${result.name}`}
         className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl transition-colors ${
           alreadyAdded

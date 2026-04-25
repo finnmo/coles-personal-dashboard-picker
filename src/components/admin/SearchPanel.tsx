@@ -3,10 +3,10 @@
 import { Search, Loader2 } from 'lucide-react'
 import { SearchResultCard } from './SearchResultCard'
 import { useSearch } from '@/hooks/useSearch'
-import type { OffSearchResult } from '@/lib/off-api'
+import type { StoreSearchResult } from '@/lib/store-search'
 
 interface SearchPanelProps {
-  onAdd: (result: OffSearchResult) => Promise<void>
+  onAdd: (result: StoreSearchResult) => Promise<void>
   existingIds: Set<string>
 }
 
@@ -43,9 +43,9 @@ export function SearchPanel({ onAdd, existingIds }: SearchPanelProps) {
         <div className="flex flex-col gap-2" data-testid="search-results">
           {results.map((result) => (
             <SearchResultCard
-              key={result.offProductId}
+              key={result.externalId}
               result={result}
-              alreadyAdded={existingIds.has(result.offProductId)}
+              alreadyAdded={existingIds.has(result.externalId)}
               onAdd={() => onAdd(result)}
             />
           ))}

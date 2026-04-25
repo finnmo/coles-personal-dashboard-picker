@@ -2,7 +2,6 @@ import { db } from '@/lib/db'
 import { apiError, apiOk } from '@/lib/api-response'
 import { enrichProduct } from '@/lib/product-utils'
 import { createRateLimiter } from '@/lib/rate-limiter'
-import { fetchColesImage } from '@/lib/coles-image'
 
 const postLimiter = createRateLimiter({ windowMs: 60_000, maxRequests: 30 })
 
@@ -42,19 +41,12 @@ export async function POST(request: Request) {
     return apiError('name is required', 'VALIDATION_ERROR', 400)
   }
 
-  const offImageUrl = typeof imageUrl === 'string' && imageUrl ? imageUrl : null
-  const barcode = typeof offProductId === 'string' && offProductId ? offProductId : null
-
-  // Try Coles first for a better image; fall back to OFF image on any failure
-  const colesImageUrl = await fetchColesImage(name, barcode).catch(() => null)
-  const resolvedImageUrl = colesImageUrl ?? offImageUrl
-
   try {
     const product = await db.product.create({
       data: {
         name,
-        imageUrl: resolvedImageUrl,
-        offProductId: barcode,
+        imageUrl: typeof imageUrl === 'string' && imageUrl ? imageUrl : null,
+        offProductId: typeof offProductId === 'string' && offProductId ? offProductId : null,
         repurchaseIntervalDays:
           typeof repurchaseIntervalDays === 'number' && repurchaseIntervalDays > 0
             ? repurchaseIntervalDays

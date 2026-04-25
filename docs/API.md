@@ -49,10 +49,9 @@ Body:    { name, imageUrl?, offProductId?, repurchaseIntervalDays? }
 409:     { error: "Product already exists" }
 ```
 
-The server attempts to fetch a higher-quality image from the Coles website before
-saving. It searches by `offProductId` (EAN barcode) first, then by `name`. If Coles
-returns a result the Coles CDN image URL is stored; otherwise the `imageUrl` from the
-request body (typically an Open Food Facts URL) is used as a fallback.
+The `imageUrl` is resolved at search time by the store API and passed in the request body.
+The `offProductId` field stores the `externalId` from the search result (e.g. `coles:5050551`)
+and is used as a unique constraint to prevent duplicate products.
 
 ### PATCH /api/products/[id]
 
@@ -82,24 +81,25 @@ Sets `lastPurchasedAt` to current timestamp.
 
 ### GET /api/search?q=\<query\>
 
-Searches the Open Food Facts catalogue (filtered to Australian products). Used in admin panel only.
+Searches Coles, Woolworths, and IGA concurrently. Results are ordered Coles → Woolworths → IGA. If one store is unavailable its results are silently omitted. Used in admin panel only.
 
 ```typescript
 {
   results: Array<{
-    offProductId: string // EAN barcode
+    externalId: string // "coles:5050551" | "woolworths:234567" | "iga:891011"
+    store: 'coles' | 'woolworths' | 'iga'
     name: string
-    imageUrl: string | null
+    imageUrl: string | null // resolved CDN URL (ready to display)
     brand: string | null
     quantity: string | null // e.g. "2L", "500g"
+    price: number | null
   }>
 }
 ```
 
 Errors:
 
-- `429` — upstream rate limit
-- `502` — Open Food Facts unavailable
+- `502` — all stores unavailable
 
 ## List
 

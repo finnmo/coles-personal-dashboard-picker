@@ -1,10 +1,10 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import type { OffSearchResult } from '@/lib/off-api'
+import type { StoreSearchResult } from '@/lib/store-search'
 
 type SearchState = {
-  results: OffSearchResult[]
+  results: StoreSearchResult[]
   isLoading: boolean
   error: string | null
 }

@@ -1,9 +1,9 @@
-import { searchProducts, OffApiError } from '@/lib/off-api'
+import { searchStores } from '@/lib/store-search'
 import { makeSearchCache } from '@/lib/make-search-cache'
 import { apiError, apiOk } from '@/lib/api-response'
-import type { OffSearchResult } from '@/lib/off-api'
+import type { StoreSearchResult } from '@/lib/store-search'
 
-const cache = makeSearchCache<OffSearchResult>()
+const cache = makeSearchCache<StoreSearchResult>()
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
@@ -15,14 +15,10 @@ export async function GET(request: Request) {
   if (cached) return apiOk({ results: cached, cached: true })
 
   try {
-    const results = await searchProducts(query)
+    const results = await searchStores(query)
     cache.setCached(query, results)
     return apiOk({ results })
-  } catch (err) {
-    if (err instanceof OffApiError) {
-      const status = err.status === 429 ? 429 : 502
-      return apiError(err.message, 'UPSTREAM_ERROR', status)
-    }
-    throw err
+  } catch {
+    return apiError('Search unavailable', 'UPSTREAM_ERROR', 502)
   }
 }

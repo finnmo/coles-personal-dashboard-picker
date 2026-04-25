@@ -5,7 +5,7 @@ import { X, Settings2 } from 'lucide-react'
 import { SearchPanel } from '@/components/admin/SearchPanel'
 import { ProductManager } from '@/components/admin/ProductManager'
 import { useProducts } from '@/hooks/useProducts'
-import type { OffSearchResult } from '@/lib/off-api'
+import type { StoreSearchResult } from '@/lib/store-search'
 
 interface AddProductDialogProps {
   open: boolean
@@ -61,14 +61,14 @@ export function AddProductDialog({ open, onClose }: AddProductDialogProps) {
     (products ?? []).map((p) => p.offProductId).filter(Boolean) as string[]
   )
 
-  async function handleAdd(result: OffSearchResult) {
+  async function handleAdd(result: StoreSearchResult) {
     await fetch('/api/products', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name: result.name,
         imageUrl: result.imageUrl || null,
-        offProductId: result.offProductId,
+        offProductId: result.externalId,
       }),
     })
     await mutate()
