@@ -5,6 +5,13 @@ set -e
 mkdir -p /app/data
 chown -R nextjs:nodejs /app/data
 
+# ─── DATABASE_URL default ────────────────────────────────────────────────────────
+# Always stored in the mounted data volume. Users never need to set this.
+if [ -z "$DATABASE_URL" ]; then
+  DATABASE_URL="file:/app/data/dashboard.db"
+  export DATABASE_URL
+fi
+
 # ─── SESSION_SECRET auto-generation ─────────────────────────────────────────────
 # If SESSION_SECRET is blank, load from persisted file or generate a new one.
 SECRET_FILE="/app/data/.session_secret"
