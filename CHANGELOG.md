@@ -37,6 +37,7 @@
 ### Performance Improvements
 
 * **docker:** build platforms in parallel using native runners ([5fc2620](https://github.com/finnmo/coles-personal-dashboard-picker/commit/5fc2620ca0b8623867f7e1da89967a2e30ccc051))
+* **docker:** simplify to amd64-only build ([d3271fd](https://github.com/finnmo/coles-personal-dashboard-picker/commit/d3271fdf4418b4be5888d6667534f06a6e3d16ad))
 * **docker:** switch to registry cache + fix CHANGELOG formatting ([261f11a](https://github.com/finnmo/coles-personal-dashboard-picker/commit/261f11a3c92277ea3e6e721dd0353f7870211b04))
 
 
