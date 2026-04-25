@@ -34,4 +34,9 @@
 * round-2 improvements — shopping list, Unraid deploy, observability, resilience ([a3a2d0c](https://github.com/finnmo/coles-personal-dashboard-picker/commit/a3a2d0c06a1b375491b3ff86ea1d62ba5a2e771f))
 
 
+### Performance Improvements
+
+* **docker:** build platforms in parallel using native runners ([5fc2620](https://github.com/finnmo/coles-personal-dashboard-picker/commit/5fc2620ca0b8623867f7e1da89967a2e30ccc051))
+
+
 
