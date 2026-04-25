@@ -24,7 +24,7 @@ export class GoogleTasksProvider implements ListProvider {
     await tasks.tasks.insert({
       tasklist: this.taskListId,
       requestBody: {
-        title: `${item.productName} (${item.store})`,
+        title: item.productName,
       },
     })
 

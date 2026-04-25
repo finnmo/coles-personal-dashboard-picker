@@ -42,7 +42,7 @@ describe('GoogleTasksProvider', () => {
 
   beforeEach(async () => {
     const { insert } = await getMocks()
-    insert.mockResolvedValue({ data: { id: 'task-123', title: 'Milk (COLES)' } })
+    insert.mockResolvedValue({ data: { id: 'task-123', title: 'Milk' } })
   })
 
   it('has name "google_tasks"', () => {
@@ -62,7 +62,7 @@ describe('GoogleTasksProvider', () => {
       CREDS.refreshToken,
       CREDS.taskListId
     )
-    const result = await provider.add({ productName: 'Milk', store: 'COLES' })
+    const result = await provider.add({ productName: 'Milk' })
     expect(result.ok).toBe(true)
   })
 
@@ -73,11 +73,11 @@ describe('GoogleTasksProvider', () => {
       CREDS.refreshToken,
       CREDS.taskListId
     )
-    const result = await provider.add({ productName: 'Milk', store: 'COLES' })
+    const result = await provider.add({ productName: 'Milk' })
     expect(result.redirectUrl).toBeUndefined()
   })
 
-  it('inserts a task with product name and store in title', async () => {
+  it('inserts a task with product name as title', async () => {
     const { insert } = await getMocks()
     const provider = new GoogleTasksProvider(
       CREDS.clientId,
@@ -85,11 +85,11 @@ describe('GoogleTasksProvider', () => {
       CREDS.refreshToken,
       CREDS.taskListId
     )
-    await provider.add({ productName: 'Greek Yogurt', store: 'IGA' })
+    await provider.add({ productName: 'Greek Yogurt' })
     expect(insert).toHaveBeenCalledWith(
       expect.objectContaining({
         tasklist: CREDS.taskListId,
-        requestBody: expect.objectContaining({ title: 'Greek Yogurt (IGA)' }),
+        requestBody: expect.objectContaining({ title: 'Greek Yogurt' }),
       })
     )
   })
@@ -102,7 +102,7 @@ describe('GoogleTasksProvider', () => {
       CREDS.refreshToken,
       'my-custom-list-id'
     )
-    await provider.add({ productName: 'Bread', store: 'COLES' })
+    await provider.add({ productName: 'Bread' })
     expect(insert).toHaveBeenCalledWith(expect.objectContaining({ tasklist: 'my-custom-list-id' }))
   })
 })

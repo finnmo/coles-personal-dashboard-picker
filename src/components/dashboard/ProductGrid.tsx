@@ -7,15 +7,9 @@ import { ProductTile } from './ProductTile'
 import { ProductGridSkeleton } from './ProductGridSkeleton'
 import { EmptyState } from './EmptyState'
 import { ProductFilter } from './ProductFilter'
-import { STORE_LABELS } from '@/lib/constants'
-import type { Store } from '@/types/product'
 
-interface ProductGridProps {
-  store: Store
-}
-
-export function ProductGrid({ store }: ProductGridProps) {
-  const { products, isLoading, mutate } = useProducts(store)
+export function ProductGrid() {
+  const { products, isLoading, mutate } = useProducts()
   const { mutate: globalMutate } = useSWRConfig()
   const [reordering, setReordering] = useState(false)
 
@@ -27,7 +21,7 @@ export function ProductGrid({ store }: ProductGridProps) {
   }, [mutate, globalMutate])
 
   if (isLoading) return <ProductGridSkeleton />
-  if (!products || products.length === 0) return <EmptyState store={STORE_LABELS[store]} />
+  if (!products || products.length === 0) return <EmptyState />
 
   return (
     <ProductFilter products={products}>

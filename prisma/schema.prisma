@@ -8,14 +8,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// store is constrained to "COLES" | "IGA" in application code (SQLite has no enum support)
 model Product {
   id                     String            @id @default(cuid())
   name                   String
   imageUrl               String?
-  store                  String
-  colesProductId         String?           @unique
-  igaProductId           String?           @unique
+  offProductId           String?           @unique
   repurchaseIntervalDays Int               @default(14)
   lastPurchasedAt        DateTime?
   createdAt              DateTime          @default(now())
@@ -24,7 +21,6 @@ model Product {
   shoppingListItem       ShoppingListItem?
   purchaseEvents         PurchaseEvent[]
 
-  @@index([store])
   @@index([lastPurchasedAt])
   @@index([deletedAt])
 }

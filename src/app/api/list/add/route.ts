@@ -2,7 +2,6 @@ import { db } from '@/lib/db'
 import { getListProvider } from '@/lib/list-providers'
 import { apiError, apiOk } from '@/lib/api-response'
 import { createRateLimiter } from '@/lib/rate-limiter'
-import type { Store } from '@/types/product'
 
 const listLimiter = createRateLimiter({ windowMs: 60_000, maxRequests: 60 })
 
@@ -38,7 +37,7 @@ export async function POST(request: Request) {
   }
 
   const [result] = await Promise.all([
-    provider.add({ productName: product.name, store: product.store as Store }),
+    provider.add({ productName: product.name }),
     db.shoppingListItem.upsert({
       where: { productId },
       update: { addedAt: new Date() },

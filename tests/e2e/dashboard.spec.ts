@@ -5,23 +5,8 @@ test.describe('Dashboard', () => {
     await login(page)
   })
 
-  test('redirects to /dashboard/coles after login', async ({ page }) => {
-    await expect(page).toHaveURL(/\/dashboard\/coles/)
-  })
-
-  test('Coles tab is active by default', async ({ page }) => {
-    const colesTab = page.getByTestId('tab-coles')
-    await expect(colesTab).toHaveAttribute('aria-current', 'page')
-  })
-
-  test('clicking IGA tab navigates to /dashboard/iga and persists in URL', async ({ page }) => {
-    await page.getByTestId('tab-iga').click()
-    await expect(page).toHaveURL(/\/dashboard\/iga/)
-    await expect(page.getByTestId('tab-iga')).toHaveAttribute('aria-current', 'page')
-
-    // Reload should keep IGA tab active
-    await page.reload()
-    await expect(page.getByTestId('tab-iga')).toHaveAttribute('aria-current', 'page')
+  test('lands on /dashboard after login', async ({ page }) => {
+    await expect(page).toHaveURL(/\/dashboard/)
   })
 
   test('theme toggle switches between light and dark mode', async ({ page }) => {
@@ -57,9 +42,9 @@ test.describe('Dashboard — product interaction', () => {
 
   test.beforeEach(async ({ page }) => {
     await login(page)
-    const seeded = await seedProduct(page, { name: 'E2E Milk', store: 'COLES' })
+    const seeded = await seedProduct(page, { name: 'E2E Milk' })
     cleanup = seeded.cleanup
-    await page.goto('/dashboard/coles')
+    await page.goto('/dashboard')
   })
 
   test.afterEach(async () => {

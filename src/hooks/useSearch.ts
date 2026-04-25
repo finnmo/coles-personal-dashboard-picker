@@ -1,15 +1,15 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import type { ColesSearchResult } from '@/lib/coles-api'
+import type { OffSearchResult } from '@/lib/off-api'
 
 type SearchState = {
-  results: ColesSearchResult[]
+  results: OffSearchResult[]
   isLoading: boolean
   error: string | null
 }
 
-export function useSearch(store: 'coles' | 'iga' = 'coles') {
+export function useSearch() {
   const [query, setQuery] = useState('')
   const [state, setState] = useState<SearchState>({ results: [], isLoading: false, error: null })
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -26,7 +26,7 @@ export function useSearch(store: 'coles' | 'iga' = 'coles') {
 
     debounceRef.current = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/search/${store}?q=${encodeURIComponent(query)}`)
+        const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`)
         const data = await res.json()
         if (!res.ok) {
           setState({ results: [], isLoading: false, error: data.error ?? 'Search failed' })
@@ -41,7 +41,7 @@ export function useSearch(store: 'coles' | 'iga' = 'coles') {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current)
     }
-  }, [query, store])
+  }, [query])
 
   return { query, setQuery, ...state }
 }

@@ -29,7 +29,7 @@ export default async function SharedListPage({ params }: PageProps) {
 
   const items = await db.shoppingListItem.findMany({
     include: {
-      product: { select: { id: true, name: true, imageUrl: true, store: true } },
+      product: { select: { id: true, name: true, imageUrl: true } },
     },
     orderBy: { addedAt: 'asc' },
   })
@@ -48,7 +48,7 @@ export default async function SharedListPage({ params }: PageProps) {
               <div className="min-w-0 flex-1">
                 <p className="font-medium">{item.product.name}</p>
                 <p className="text-xs text-muted-foreground">
-                  {item.product.store} · Added {fmt.format(new Date(item.addedAt))}
+                  Added {fmt.format(new Date(item.addedAt))}
                 </p>
               </div>
             </li>

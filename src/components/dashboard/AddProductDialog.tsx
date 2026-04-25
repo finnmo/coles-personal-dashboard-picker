@@ -2,31 +2,23 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { X, Settings2 } from 'lucide-react'
-import { usePathname } from 'next/navigation'
 import { SearchPanel } from '@/components/admin/SearchPanel'
 import { ProductManager } from '@/components/admin/ProductManager'
 import { useProducts } from '@/hooks/useProducts'
-import type { Store } from '@/types/product'
-import type { ColesSearchResult } from '@/lib/coles-api'
+import type { OffSearchResult } from '@/lib/off-api'
 
 interface AddProductDialogProps {
   open: boolean
   onClose: () => void
 }
 
-const STORES: Store[] = ['COLES', 'IGA']
-const STORE_LABELS: Record<Store, string> = { COLES: 'Coles', IGA: 'IGA' }
-
 type Tab = 'search' | 'manage'
 
 export function AddProductDialog({ open, onClose }: AddProductDialogProps) {
-  const pathname = usePathname()
-  const defaultStore: Store = pathname.includes('iga') ? 'IGA' : 'COLES'
-  const [activeStore, setActiveStore] = useState<Store>(defaultStore)
   const [activeTab, setActiveTab] = useState<Tab>('search')
   const [closing, setClosing] = useState(false)
   const [maxHeight, setMaxHeight] = useState<string>('85dvh')
-  const { products, mutate } = useProducts(activeStore)
+  const { products, mutate } = useProducts()
   const dialogRef = useRef<HTMLDivElement>(null)
 
   // Track visual viewport so the dialog stays above the iPad keyboard
@@ -52,11 +44,10 @@ export function AddProductDialog({ open, onClose }: AddProductDialogProps) {
 
   useEffect(() => {
     if (open) {
-      setActiveStore(defaultStore)
       setActiveTab('search')
       setClosing(false)
     }
-  }, [open, defaultStore])
+  }, [open])
 
   function close() {
     setClosing(true)
@@ -67,21 +58,17 @@ export function AddProductDialog({ open, onClose }: AddProductDialogProps) {
   }
 
   const existingIds = new Set(
-    (products ?? [])
-      .map((p) => (activeStore === 'COLES' ? p.colesProductId : p.igaProductId))
-      .filter(Boolean) as string[]
+    (products ?? []).map((p) => p.offProductId).filter(Boolean) as string[]
   )
 
-  async function handleAdd(result: ColesSearchResult) {
+  async function handleAdd(result: OffSearchResult) {
     await fetch('/api/products', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name: result.name,
         imageUrl: result.imageUrl || null,
-        store: activeStore,
-        colesProductId: activeStore === 'COLES' ? result.colesProductId : null,
-        igaProductId: activeStore === 'IGA' ? result.colesProductId : null,
+        offProductId: result.offProductId,
       }),
     })
     await mutate()
@@ -137,23 +124,9 @@ export function AddProductDialog({ open, onClose }: AddProductDialogProps) {
             </button>
           </div>
 
-          {/* Store + tab controls */}
-          <div className="flex flex-shrink-0 flex-wrap gap-2 px-5 pb-3">
-            {STORES.map((store) => (
-              <button
-                key={store}
-                onClick={() => setActiveStore(store)}
-                className={`rounded-xl px-5 py-2.5 text-sm font-semibold transition-colors ${
-                  activeStore === store
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted text-muted-foreground active:bg-muted/70'
-                }`}
-              >
-                {STORE_LABELS[store]}
-              </button>
-            ))}
-
-            <div className="ml-auto flex rounded-xl bg-muted p-1 gap-1">
+          {/* Tab controls */}
+          <div className="flex flex-shrink-0 px-5 pb-3">
+            <div className="flex rounded-xl bg-muted p-1 gap-1">
               <button
                 onClick={() => setActiveTab('search')}
                 className={`rounded-lg px-4 py-1.5 text-sm font-semibold transition-colors ${
@@ -181,7 +154,7 @@ export function AddProductDialog({ open, onClose }: AddProductDialogProps) {
           {/* Scrollable content */}
           <div className="flex-1 overflow-y-auto px-5 pt-1 pb-6">
             {activeTab === 'search' ? (
-              <SearchPanel store={activeStore} onAdd={handleAdd} existingIds={existingIds} />
+              <SearchPanel onAdd={handleAdd} existingIds={existingIds} />
             ) : (
               <ProductManager
                 products={products ?? []}

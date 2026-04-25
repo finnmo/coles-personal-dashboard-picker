@@ -12,7 +12,7 @@ afterAll(cleanDb)
 describe('Product DB operations', () => {
   it('creates and retrieves a product', async () => {
     const created = await db.product.create({
-      data: { name: 'Butter', store: 'COLES', repurchaseIntervalDays: 21 },
+      data: { name: 'Butter', repurchaseIntervalDays: 21 },
     })
     const found = await db.product.findUnique({ where: { id: created.id } })
     expect(found).not.toBeNull()
@@ -21,35 +21,22 @@ describe('Product DB operations', () => {
     expect(found!.lastPurchasedAt).toBeNull()
   })
 
-  it('enforces unique colesProductId constraint', async () => {
-    await db.product.create({ data: { name: 'Milk', store: 'COLES', colesProductId: 'uid-1' } })
+  it('enforces unique offProductId constraint', async () => {
+    await db.product.create({ data: { name: 'Milk', offProductId: 'barcode-uid-1' } })
     await expect(
-      db.product.create({ data: { name: 'Milk Lite', store: 'COLES', colesProductId: 'uid-1' } })
+      db.product.create({ data: { name: 'Milk Lite', offProductId: 'barcode-uid-1' } })
     ).rejects.toMatchObject({ code: 'P2002' })
   })
 
-  it('allows same colesProductId to be null on multiple rows', async () => {
-    await db.product.create({ data: { name: 'Apple', store: 'COLES' } })
-    await db.product.create({ data: { name: 'Orange', store: 'COLES' } })
-    const count = await db.product.count({ where: { store: 'COLES' } })
+  it('allows null offProductId on multiple rows', async () => {
+    await db.product.create({ data: { name: 'Apple' } })
+    await db.product.create({ data: { name: 'Orange' } })
+    const count = await db.product.count()
     expect(count).toBe(2)
   })
 
-  it('filters by store', async () => {
-    await db.product.createMany({
-      data: [
-        { name: 'Coles Milk', store: 'COLES' },
-        { name: 'IGA Bread', store: 'IGA' },
-        { name: 'Coles Cheese', store: 'COLES' },
-      ],
-    })
-    const colesProducts = await db.product.findMany({ where: { store: 'COLES' } })
-    expect(colesProducts).toHaveLength(2)
-    expect(colesProducts.every((p) => p.store === 'COLES')).toBe(true)
-  })
-
   it('updates lastPurchasedAt', async () => {
-    const created = await db.product.create({ data: { name: 'Eggs', store: 'IGA' } })
+    const created = await db.product.create({ data: { name: 'Eggs' } })
     const now = new Date()
     const updated = await db.product.update({
       where: { id: created.id },
@@ -60,14 +47,14 @@ describe('Product DB operations', () => {
   })
 
   it('deletes a product', async () => {
-    const created = await db.product.create({ data: { name: 'Yogurt', store: 'COLES' } })
+    const created = await db.product.create({ data: { name: 'Yogurt' } })
     await db.product.delete({ where: { id: created.id } })
     const gone = await db.product.findUnique({ where: { id: created.id } })
     expect(gone).toBeNull()
   })
 
   it('updates repurchaseIntervalDays', async () => {
-    const created = await db.product.create({ data: { name: 'Juice', store: 'IGA' } })
+    const created = await db.product.create({ data: { name: 'Juice' } })
     expect(created.repurchaseIntervalDays).toBe(14)
     const updated = await db.product.update({
       where: { id: created.id },

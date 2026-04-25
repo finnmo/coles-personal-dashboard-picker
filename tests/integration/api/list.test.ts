@@ -49,9 +49,7 @@ describe('POST /api/list/add — apple_reminders', () => {
   })
 
   it('returns 200 with ok=true for a valid product', async () => {
-    const product = await db.product.create({
-      data: { name: 'Full Cream Milk 2L', store: 'COLES' },
-    })
+    const product = await db.product.create({ data: { name: 'Full Cream Milk 2L' } })
     const res = await addToList(makeRequest({ productId: product.id }))
     expect(res.status).toBe(200)
     const body = await res.json()
@@ -59,23 +57,18 @@ describe('POST /api/list/add — apple_reminders', () => {
   })
 
   it('returns a shortcuts:// redirectUrl for apple_reminders', async () => {
-    const product = await db.product.create({
-      data: { name: 'Cheese Block', store: 'COLES' },
-    })
+    const product = await db.product.create({ data: { name: 'Cheese Block' } })
     const res = await addToList(makeRequest({ productId: product.id }))
     const body = await res.json()
     expect(body.redirectUrl).toMatch(/^shortcuts:\/\//)
   })
 
-  it('redirectUrl contains the product name and store in the input param', async () => {
-    const product = await db.product.create({
-      data: { name: 'Greek Yogurt', store: 'IGA' },
-    })
+  it('redirectUrl contains the product name in the input param', async () => {
+    const product = await db.product.create({ data: { name: 'Greek Yogurt' } })
     const res = await addToList(makeRequest({ productId: product.id }))
     const body = await res.json()
     const url = new URL(body.redirectUrl)
     const input = JSON.parse(url.searchParams.get('input')!)
     expect(input.name).toBe('Greek Yogurt')
-    expect(input.store).toBe('IGA')
   })
 })

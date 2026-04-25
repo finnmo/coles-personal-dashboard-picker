@@ -10,7 +10,7 @@ export class AppleRemindersProvider implements ListProvider {
   }
 
   add(item: AddItemRequest): Promise<AddItemResponse> {
-    const input = JSON.stringify({ name: item.productName, store: item.store })
+    const input = JSON.stringify({ name: item.productName })
     const redirectUrl =
       `shortcuts://run-shortcut` +
       `?name=${encodeURIComponent(this.shortcutName)}` +

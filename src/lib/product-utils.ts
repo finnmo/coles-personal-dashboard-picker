@@ -1,13 +1,11 @@
 import { computePriority } from '@/lib/priority'
-import type { EnrichedProduct, Store } from '@/types/product'
+import type { EnrichedProduct } from '@/types/product'
 
 export type PrismaProduct = {
   id: string
   name: string
   imageUrl: string | null
-  store: string
-  colesProductId: string | null
-  igaProductId: string | null
+  offProductId: string | null
   repurchaseIntervalDays: number
   lastPurchasedAt: Date | null
   createdAt: Date
@@ -24,9 +22,7 @@ export function enrichProduct(product: PrismaProduct): EnrichedProduct {
     id: product.id,
     name: product.name,
     imageUrl: product.imageUrl,
-    store: product.store as Store,
-    colesProductId: product.colesProductId,
-    igaProductId: product.igaProductId,
+    offProductId: product.offProductId,
     repurchaseIntervalDays: product.repurchaseIntervalDays,
     lastPurchasedAt: product.lastPurchasedAt?.toISOString() ?? null,
     createdAt: product.createdAt.toISOString(),

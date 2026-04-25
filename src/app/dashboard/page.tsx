@@ -1,5 +1,5 @@
-import { redirect } from 'next/navigation'
+import { ProductGridWithBoundary } from '@/components/dashboard/ProductGridWithBoundary'
 
 export default function DashboardPage() {
-  redirect('/dashboard/coles')
+  return <ProductGridWithBoundary />
 }

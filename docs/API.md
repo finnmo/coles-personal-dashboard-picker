@@ -20,9 +20,9 @@ Body:    { "password": string }
 
 ## Products
 
-### GET /api/products?store=COLES|IGA
+### GET /api/products
 
-Returns products sorted descending by priority score.
+Returns all products sorted descending by priority score.
 
 ```typescript
 {
@@ -30,9 +30,7 @@ Returns products sorted descending by priority score.
     id: string
     name: string
     imageUrl: string | null
-    store: 'COLES' | 'IGA'
-    colesProductId: string | null
-    igaProductId: string | null
+    offProductId: string | null
     repurchaseIntervalDays: number
     lastPurchasedAt: string | null // ISO 8601
     priorityScore: number
@@ -46,7 +44,7 @@ Returns products sorted descending by priority score.
 ### POST /api/products
 
 ```
-Body:    { name, imageUrl?, store, colesProductId?, igaProductId?, repurchaseIntervalDays? }
+Body:    { name, imageUrl?, offProductId?, repurchaseIntervalDays? }
 201:     { product: Product }
 409:     { error: "Product already exists" }
 ```
@@ -77,30 +75,26 @@ Sets `lastPurchasedAt` to current timestamp.
 
 ## Search
 
-### GET /api/search/coles?q=<query>
+### GET /api/search?q=\<query\>
 
-Proxies to Coles API. Used in admin panel only.
+Searches the Open Food Facts catalogue (filtered to Australian products). Used in admin panel only.
 
 ```typescript
 {
   results: Array<{
-    colesProductId: string
+    offProductId: string // EAN barcode
     name: string
-    imageUrl: string
+    imageUrl: string | null
     brand: string | null
-    packageSize: string | null
-    price: number | null
+    quantity: string | null // e.g. "2L", "500g"
   }>
 }
 ```
 
-Note: Rate limiting may apply from the upstream Coles API.
+Errors:
 
-### GET /api/search/iga?q=<query>
-
-```
-501: { error: "IGA search not yet implemented" }
-```
+- `429` — upstream rate limit
+- `502` — Open Food Facts unavailable
 
 ## List
 

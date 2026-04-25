@@ -3,10 +3,10 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { Plus, Check, Loader2 } from 'lucide-react'
-import type { ColesSearchResult } from '@/lib/coles-api'
+import type { OffSearchResult } from '@/lib/off-api'
 
 interface SearchResultCardProps {
-  result: ColesSearchResult
+  result: OffSearchResult
   alreadyAdded: boolean
   onAdd: () => Promise<void>
 }
@@ -27,7 +27,7 @@ export function SearchResultCard({ result, alreadyAdded, onAdd }: SearchResultCa
   return (
     <div
       className="flex items-center gap-3 rounded-lg border border-border bg-card p-3"
-      data-testid={`search-result-${result.colesProductId}`}
+      data-testid={`search-result-${result.offProductId}`}
     >
       <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded bg-muted">
         {result.imageUrl ? (
@@ -47,17 +47,14 @@ export function SearchResultCard({ result, alreadyAdded, onAdd }: SearchResultCa
         <p className="truncate text-sm font-medium text-foreground">{result.name}</p>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           {result.brand && <span>{result.brand}</span>}
-          {result.packageSize && <span>{result.packageSize}</span>}
-          {result.price != null && (
-            <span className="font-medium text-foreground">${result.price.toFixed(2)}</span>
-          )}
+          {result.quantity && <span>{result.quantity}</span>}
         </div>
       </div>
 
       <button
         disabled={alreadyAdded || isAdding}
         onClick={handleAdd}
-        data-testid={`add-btn-${result.colesProductId}`}
+        data-testid={`add-btn-${result.offProductId}`}
         aria-label={alreadyAdded ? 'Already added' : `Add ${result.name}`}
         className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl transition-colors ${
           alreadyAdded

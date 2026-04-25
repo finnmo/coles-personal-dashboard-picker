@@ -6,9 +6,7 @@ const base: PrismaProduct = {
   id: 'p1',
   name: 'Milk',
   imageUrl: null,
-  store: 'COLES',
-  colesProductId: 'c1',
-  igaProductId: null,
+  offProductId: '9300617105028',
   repurchaseIntervalDays: 7,
   lastPurchasedAt: null,
   createdAt: new Date('2024-01-01'),
@@ -42,8 +40,8 @@ describe('enrichProduct', () => {
     expect(result.isOverdue).toBe(true)
   })
 
-  it('passes store as-is', () => {
-    expect(enrichProduct(base).store).toBe('COLES')
-    expect(enrichProduct({ ...base, store: 'IGA' }).store).toBe('IGA')
+  it('passes offProductId through', () => {
+    expect(enrichProduct(base).offProductId).toBe('9300617105028')
+    expect(enrichProduct({ ...base, offProductId: null }).offProductId).toBeNull()
   })
 })

@@ -1,6 +1,9 @@
-import { searchProducts, ColesApiError } from '@/lib/coles-api'
-import { getCached, setCached } from '@/lib/search-cache'
+import { searchProducts, OffApiError } from '@/lib/off-api'
+import { makeSearchCache } from '@/lib/make-search-cache'
 import { apiError, apiOk } from '@/lib/api-response'
+import type { OffSearchResult } from '@/lib/off-api'
+
+const cache = makeSearchCache<OffSearchResult>()
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
@@ -8,15 +11,15 @@ export async function GET(request: Request) {
 
   if (!query) return apiError('q parameter is required', 'VALIDATION_ERROR', 400)
 
-  const cached = getCached(query)
+  const cached = cache.getCached(query)
   if (cached) return apiOk({ results: cached, cached: true })
 
   try {
     const results = await searchProducts(query)
-    setCached(query, results)
+    cache.setCached(query, results)
     return apiOk({ results })
   } catch (err) {
-    if (err instanceof ColesApiError) {
+    if (err instanceof OffApiError) {
       const status = err.status === 429 ? 429 : 502
       return apiError(err.message, 'UPSTREAM_ERROR', status)
     }

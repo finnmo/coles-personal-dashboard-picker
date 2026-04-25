@@ -1,21 +1,20 @@
 import { test, expect, login } from './fixtures/auth'
 
-function makeMockResult(colesProductId: string) {
+function makeMockResult(offProductId: string) {
   return {
-    colesProductId,
+    offProductId,
     name: 'Full Cream Milk 2L',
-    brand: 'Coles',
-    packageSize: '2L',
-    price: 2.8,
-    imageUrl: '',
+    brand: 'Pauls',
+    quantity: '2L',
+    imageUrl: null,
   }
 }
 
-async function cleanProductByColesId(page: Parameters<typeof login>[0], colesProductId: string) {
-  const res = await page.request.get('/api/products?store=COLES')
+async function cleanProductByOffId(page: Parameters<typeof login>[0], offProductId: string) {
+  const res = await page.request.get('/api/products')
   const { products } = await res.json()
   const found = products.find(
-    (p: { colesProductId: string; id: string }) => p.colesProductId === colesProductId
+    (p: { offProductId: string; id: string }) => p.offProductId === offProductId
   )
   if (found) {
     await page.request.delete(`/api/products/${found.id}`)
@@ -32,35 +31,19 @@ test.describe('Admin Panel', () => {
     await expect(page.getByRole('heading', { name: 'Admin Panel' })).toBeVisible()
   })
 
-  test('shows store switcher buttons', async ({ page }) => {
-    await expect(page.getByTestId('admin-store-coles')).toBeVisible()
-    await expect(page.getByTestId('admin-store-iga')).toBeVisible()
-  })
-
-  test('Coles store is active by default', async ({ page }) => {
-    await expect(page.getByTestId('admin-store-coles')).toHaveClass(/bg-coles-red/)
-  })
-
-  test('switches to IGA store', async ({ page }) => {
-    await page.getByTestId('admin-store-iga').click()
-    await expect(page.getByTestId('admin-store-iga')).toHaveClass(/bg-iga-green/)
-    await expect(page.getByText('Your IGA Products')).toBeVisible()
-  })
-
   test('search input is visible', async ({ page }) => {
     await expect(page.getByTestId('admin-search-input')).toBeVisible()
   })
 })
 
 test.describe('Admin Search', () => {
-  // Unique ID per test run to avoid cross-run state
   let searchProductId: string
 
   test.beforeEach(async ({ page }) => {
-    searchProductId = `e2e-milk-${Date.now()}`
+    searchProductId = `900${Date.now()}`
     await login(page)
 
-    await page.route('/api/search/coles*', async (route) => {
+    await page.route('/api/search*', async (route) => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -72,7 +55,7 @@ test.describe('Admin Search', () => {
   })
 
   test.afterEach(async ({ page }) => {
-    await cleanProductByColesId(page, searchProductId)
+    await cleanProductByOffId(page, searchProductId)
   })
 
   test('shows search results after typing', async ({ page }) => {
@@ -115,8 +98,6 @@ test.describe('Admin Product Management', () => {
     const res = await page.request.post('/api/products', {
       data: {
         name: 'E2E Test Milk',
-        store: 'COLES',
-        colesProductId: `e2e-test-${Date.now()}`,
         repurchaseIntervalDays: 14,
       },
     })

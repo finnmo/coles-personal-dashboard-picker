@@ -3,25 +3,15 @@
 import { Search, Loader2 } from 'lucide-react'
 import { SearchResultCard } from './SearchResultCard'
 import { useSearch } from '@/hooks/useSearch'
-import type { Store } from '@/types/product'
+import type { OffSearchResult } from '@/lib/off-api'
 
 interface SearchPanelProps {
-  store: Store
-  onAdd: (result: {
-    colesProductId: string
-    name: string
-    imageUrl: string
-    brand: string | null
-    packageSize: string | null
-    price: number | null
-  }) => Promise<void>
+  onAdd: (result: OffSearchResult) => Promise<void>
   existingIds: Set<string>
 }
 
-export function SearchPanel({ store, onAdd, existingIds }: SearchPanelProps) {
-  const { query, setQuery, results, isLoading, error } = useSearch(
-    store === 'COLES' ? 'coles' : 'iga'
-  )
+export function SearchPanel({ onAdd, existingIds }: SearchPanelProps) {
+  const { query, setQuery, results, isLoading, error } = useSearch()
 
   return (
     <div className="flex flex-col gap-3">
@@ -29,7 +19,7 @@ export function SearchPanel({ store, onAdd, existingIds }: SearchPanelProps) {
         <Search className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
         <input
           type="search"
-          placeholder={`Search ${store === 'COLES' ? 'Coles' : 'IGA'} products…`}
+          placeholder="Search products…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="h-12 w-full rounded-xl border border-input bg-background pl-10 pr-4 text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
@@ -53,9 +43,9 @@ export function SearchPanel({ store, onAdd, existingIds }: SearchPanelProps) {
         <div className="flex flex-col gap-2" data-testid="search-results">
           {results.map((result) => (
             <SearchResultCard
-              key={result.colesProductId}
+              key={result.offProductId}
               result={result}
-              alreadyAdded={existingIds.has(result.colesProductId)}
+              alreadyAdded={existingIds.has(result.offProductId)}
               onAdd={() => onAdd(result)}
             />
           ))}

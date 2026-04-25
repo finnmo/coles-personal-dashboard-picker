@@ -10,10 +10,6 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        'coles-red': '#e4022d',
-        'coles-red-dark': '#b5001f',
-        'iga-green': '#007a3d',
-        'iga-green-dark': '#005a2c',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {

@@ -31,29 +31,27 @@ describe('POST /api/products', () => {
   it('creates a product and returns 201', async () => {
     const req = makeRequest('POST', 'http://localhost/api/products', {
       name: 'Full Cream Milk 2L',
-      store: 'COLES',
-      colesProductId: 'coles-123',
+      offProductId: '9300617105028',
     })
     const res = await createProduct(req)
     expect(res.status).toBe(201)
     const body = await res.json()
     expect(body.product.name).toBe('Full Cream Milk 2L')
-    expect(body.product.store).toBe('COLES')
+    expect(body.product.offProductId).toBe('9300617105028')
     expect(body.product.repurchaseIntervalDays).toBe(14)
     expect(body.product.isNew).toBe(true)
   })
 
-  it('returns 400 when name is missing', async () => {
-    const req = makeRequest('POST', 'http://localhost/api/products', { store: 'COLES' })
+  it('creates a product without offProductId', async () => {
+    const req = makeRequest('POST', 'http://localhost/api/products', { name: 'Generic Item' })
     const res = await createProduct(req)
-    expect(res.status).toBe(400)
+    expect(res.status).toBe(201)
+    const body = await res.json()
+    expect(body.product.offProductId).toBeNull()
   })
 
-  it('returns 400 for invalid store', async () => {
-    const req = makeRequest('POST', 'http://localhost/api/products', {
-      name: 'Milk',
-      store: 'WOOLWORTHS',
-    })
+  it('returns 400 when name is missing', async () => {
+    const req = makeRequest('POST', 'http://localhost/api/products', { offProductId: '123' })
     const res = await createProduct(req)
     expect(res.status).toBe(400)
   })
@@ -68,8 +66,8 @@ describe('POST /api/products', () => {
     expect(res.status).toBe(400)
   })
 
-  it('returns 409 when colesProductId already exists', async () => {
-    const body = { name: 'Milk', store: 'COLES', colesProductId: 'dupe-id' }
+  it('returns 409 when offProductId already exists', async () => {
+    const body = { name: 'Milk', offProductId: 'dupe-barcode' }
     await createProduct(makeRequest('POST', 'http://localhost/api/products', body))
     const res = await createProduct(makeRequest('POST', 'http://localhost/api/products', body))
     expect(res.status).toBe(409)
@@ -77,63 +75,47 @@ describe('POST /api/products', () => {
 })
 
 describe('GET /api/products', () => {
-  it('returns all products when no store filter', async () => {
+  it('returns all products', async () => {
     await db.product.createMany({
-      data: [
-        { name: 'Milk', store: 'COLES' },
-        { name: 'Bread', store: 'IGA' },
-      ],
+      data: [{ name: 'Milk' }, { name: 'Bread' }],
     })
-    const req = makeRequest('GET', 'http://localhost/api/products')
-    const res = await listProducts(req)
+    const res = await listProducts()
     const body = await res.json()
     expect(body.products).toHaveLength(2)
-  })
-
-  it('filters by store', async () => {
-    await db.product.createMany({
-      data: [
-        { name: 'Milk', store: 'COLES' },
-        { name: 'Bread', store: 'IGA' },
-      ],
-    })
-    const req = makeRequest('GET', 'http://localhost/api/products?store=COLES')
-    const res = await listProducts(req)
-    const body = await res.json()
-    expect(body.products).toHaveLength(1)
-    expect(body.products[0].store).toBe('COLES')
-  })
-
-  it('returns 400 for invalid store filter', async () => {
-    const req = makeRequest('GET', 'http://localhost/api/products?store=INVALID')
-    const res = await listProducts(req)
-    expect(res.status).toBe(400)
   })
 
   it('sorts overdue products before new ones', async () => {
     const overdue = await db.product.create({
       data: {
         name: 'Overdue Item',
-        store: 'COLES',
         repurchaseIntervalDays: 7,
         lastPurchasedAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
       },
     })
-    await db.product.create({ data: { name: 'New Item', store: 'COLES' } })
+    await db.product.create({ data: { name: 'New Item' } })
 
-    const req = makeRequest('GET', 'http://localhost/api/products?store=COLES')
-    const res = await listProducts(req)
+    const res = await listProducts()
     const body = await res.json()
 
     expect(body.products[0].id).toBe(overdue.id)
     expect(body.products[0].isOverdue).toBe(true)
     expect(body.products[body.products.length - 1].isNew).toBe(true)
   })
+
+  it('excludes soft-deleted products', async () => {
+    await db.product.create({ data: { name: 'Visible' } })
+    await db.product.create({ data: { name: 'Deleted', deletedAt: new Date() } })
+
+    const res = await listProducts()
+    const body = await res.json()
+    expect(body.products).toHaveLength(1)
+    expect(body.products[0].name).toBe('Visible')
+  })
 })
 
 describe('GET /api/products/[id]', () => {
   it('returns the product', async () => {
-    const created = await db.product.create({ data: { name: 'Eggs', store: 'COLES' } })
+    const created = await db.product.create({ data: { name: 'Eggs' } })
     const req = makeRequest('GET', `http://localhost/api/products/${created.id}`)
     const res = await getProduct(req, params(created.id))
     expect(res.status).toBe(200)
@@ -150,7 +132,7 @@ describe('GET /api/products/[id]', () => {
 
 describe('PATCH /api/products/[id]', () => {
   it('updates repurchaseIntervalDays', async () => {
-    const created = await db.product.create({ data: { name: 'Cheese', store: 'COLES' } })
+    const created = await db.product.create({ data: { name: 'Cheese' } })
     const req = makeRequest('PATCH', `http://localhost/api/products/${created.id}`, {
       repurchaseIntervalDays: 21,
     })
@@ -161,7 +143,7 @@ describe('PATCH /api/products/[id]', () => {
   })
 
   it('updates name', async () => {
-    const created = await db.product.create({ data: { name: 'Old Name', store: 'IGA' } })
+    const created = await db.product.create({ data: { name: 'Old Name' } })
     const req = makeRequest('PATCH', `http://localhost/api/products/${created.id}`, {
       name: 'New Name',
     })
@@ -178,8 +160,8 @@ describe('PATCH /api/products/[id]', () => {
 })
 
 describe('DELETE /api/products/[id]', () => {
-  it('deletes the product and returns ok', async () => {
-    const created = await db.product.create({ data: { name: 'Delete Me', store: 'COLES' } })
+  it('soft-deletes the product and returns ok', async () => {
+    const created = await db.product.create({ data: { name: 'Delete Me' } })
     const req = makeRequest('DELETE', `http://localhost/api/products/${created.id}`)
     const res = await deleteProduct(req, params(created.id))
     expect(res.status).toBe(200)
@@ -200,7 +182,7 @@ describe('DELETE /api/products/[id]', () => {
 describe('POST /api/products/[id]/purchase', () => {
   it('sets lastPurchasedAt to now', async () => {
     const before = new Date()
-    const created = await db.product.create({ data: { name: 'Yogurt', store: 'COLES' } })
+    const created = await db.product.create({ data: { name: 'Yogurt' } })
     expect(created.lastPurchasedAt).toBeNull()
 
     const req = makeRequest('POST', `http://localhost/api/products/${created.id}/purchase`)

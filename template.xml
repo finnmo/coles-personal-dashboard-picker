@@ -9,9 +9,9 @@
   <Support>https://github.com/finnmo/coles-personal-dashboard-picker/issues</Support>
   <Project>https://github.com/finnmo/coles-personal-dashboard-picker</Project>
   <Overview>
-    Wall-mounted household grocery dashboard for Coles and IGA.
+    Wall-mounted household grocery dashboard.
     Tap products to add them to your shopping list (Apple Reminders or Google Tasks).
-    Curate your product list via the built-in search panel.
+    Curate your product list by searching the Open Food Facts catalogue — no API key required.
     Designed for an iPad mounted on the wall, running on your local network.
   </Overview>
   <Category>HomeAutomation: Tools:</Category>
@@ -136,17 +136,17 @@
     Required="false"
     Mask="false"></Config>
 
-  <!-- Coles search -->
+  <!-- Open Food Facts (optional) -->
   <Config
-    Name="RapidAPI Key"
-    Target="RAPIDAPI_KEY"
+    Name="Open Food Facts Email"
+    Target="OPEN_FOOD_FACTS_EMAIL"
     Default=""
     Mode=""
-    Description="API key for Coles product search. Get a free key at rapidapi.com. Optional — only needed to add new Coles products."
+    Description="Your email address, included in the User-Agent sent to Open Food Facts. Optional but appreciated by the project."
     Type="Variable"
-    Display="always"
+    Display="advanced"
     Required="false"
-    Mask="true"></Config>
+    Mask="false"></Config>
 
   <!-- Optional tuning -->
   <Config

@@ -1,6 +1,5 @@
 export interface AddItemRequest {
   productName: string
-  store: 'COLES' | 'IGA'
 }
 
 export interface AddItemResponse {

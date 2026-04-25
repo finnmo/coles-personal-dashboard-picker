@@ -5,9 +5,9 @@ test.describe('Shopping List Panel', () => {
 
   test.beforeEach(async ({ page }) => {
     await login(page)
-    const seeded = await seedProduct(page, { name: 'E2E List Milk', store: 'COLES' })
+    const seeded = await seedProduct(page, { name: 'E2E List Milk' })
     cleanup = seeded.cleanup
-    await page.goto('/dashboard/coles')
+    await page.goto('/dashboard')
   })
 
   test.afterEach(async ({ page }) => {

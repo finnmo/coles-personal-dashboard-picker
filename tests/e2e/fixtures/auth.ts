@@ -4,12 +4,12 @@ async function login(page: Page, password = process.env.E2E_PASSWORD ?? 'e2e-tes
   await page.goto('/login')
   await page.getByTestId('password-input').fill(password)
   await page.getByTestId('login-button').click()
-  await page.waitForURL('/dashboard/coles')
+  await page.waitForURL('/dashboard')
 }
 
 async function seedProduct(
   page: Page,
-  data: { name: string; store: 'COLES' | 'IGA'; repurchaseIntervalDays?: number }
+  data: { name: string; repurchaseIntervalDays?: number }
 ): Promise<{ id: string; cleanup: () => Promise<void> }> {
   const res = await page.request.post('/api/products', {
     data: { repurchaseIntervalDays: 14, ...data },

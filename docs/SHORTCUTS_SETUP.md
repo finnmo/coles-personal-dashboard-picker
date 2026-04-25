@@ -7,7 +7,7 @@ The dashboard sends grocery items to your shared Apple Reminders list via an iOS
 When you tap the purchase button, the app opens a URL of this form:
 
 ```
-shortcuts://run-shortcut?name=AddToShopping&input={"name":"Full Cream Milk 2L","store":"COLES"}
+shortcuts://run-shortcut?name=AddToShopping&input={"name":"Full Cream Milk 2L"}
 ```
 
 Your Shortcut receives the JSON payload and adds the product name as a new Reminder.
@@ -63,7 +63,7 @@ Add these five actions in order:
 In Safari on the iPad, navigate to:
 
 ```
-shortcuts://run-shortcut?name=AddToShopping&input=%7B%22name%22%3A%22Test%20Milk%22%2C%22store%22%3A%22COLES%22%7D
+shortcuts://run-shortcut?name=AddToShopping&input=%7B%22name%22%3A%22Test%20Milk%22%7D
 ```
 
 You should see "Test Milk" appear in your shared Reminders list.

@@ -1,12 +1,8 @@
-export type Store = 'COLES' | 'IGA'
-
 export type Product = {
   id: string
   name: string
   imageUrl: string | null
-  store: Store
-  colesProductId: string | null
-  igaProductId: string | null
+  offProductId: string | null
   repurchaseIntervalDays: number
   lastPurchasedAt: string | null
   createdAt: string
