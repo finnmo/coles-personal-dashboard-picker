@@ -24,30 +24,30 @@ services:
       # ── First-run setup ───────────────────────────────────────────────────
       # Set SETUP_PASSWORD on first start. The container hashes it and
       # persists the hash to /app/data. You can then remove SETUP_PASSWORD.
-      SETUP_PASSWORD: ""
+      SETUP_PASSWORD: ''
 
       # Leave blank — auto-generated and persisted on first start.
-      SESSION_SECRET: ""
+      SESSION_SECRET: ''
 
       # ── List integration ──────────────────────────────────────────────────
       # Options: apple_reminders | google_tasks
-      LIST_PROVIDER: "apple_reminders"
+      LIST_PROVIDER: 'apple_reminders'
       # Must match the exact name of your iOS Shortcut
-      APPLE_SHORTCUTS_NAME: "AddToShopping"
+      APPLE_SHORTCUTS_NAME: 'AddToShopping'
 
       # Google Tasks (only needed if LIST_PROVIDER=google_tasks)
-      GOOGLE_CLIENT_ID: ""
-      GOOGLE_CLIENT_SECRET: ""
-      GOOGLE_REFRESH_TOKEN: ""
-      GOOGLE_TASK_LIST_ID: ""
+      GOOGLE_CLIENT_ID: ''
+      GOOGLE_CLIENT_SECRET: ''
+      GOOGLE_REFRESH_TOKEN: ''
+      GOOGLE_TASK_LIST_ID: ''
 
       # ── Coles product search ──────────────────────────────────────────────
       # Get a free key at: https://rapidapi.com/search/coles
-      RAPIDAPI_KEY: ""
+      RAPIDAPI_KEY: ''
 
       # ── Optional ──────────────────────────────────────────────────────────
-      LOG_LEVEL: "info"
-      SESSION_EXPIRY_HOURS: "24"
+      LOG_LEVEL: 'info'
+      SESSION_EXPIRY_HOURS: '24'
 
     healthcheck:
       test: ['CMD', 'wget', '-qO-', 'http://localhost:3000/api/health']

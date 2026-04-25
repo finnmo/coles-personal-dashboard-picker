@@ -187,7 +187,7 @@ describe('DELETE /api/products/[id]', () => {
     expect(body.ok).toBe(true)
 
     const gone = await db.product.findUnique({ where: { id: created.id } })
-    expect(gone).toBeNull()
+    expect(gone?.deletedAt).not.toBeNull()
   })
 
   it('returns 404 for unknown id', async () => {
