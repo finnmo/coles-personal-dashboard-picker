@@ -10,6 +10,7 @@
 * **coles-api:** construct CDN image URL directly instead of scraping ([1f4aafa](https://github.com/finnmo/coles-personal-dashboard-picker/commit/1f4aafa5abc653cf86bb8093a587b1735237b1da))
 * **deps:** replace deprecated conventional-changelog-cli with conventional-changelog@7 ([e24dffc](https://github.com/finnmo/coles-personal-dashboard-picker/commit/e24dffc4c04b19941b9ae8ac0363bcd32d677da8))
 * **docker:** copy bcryptjs explicitly into runner stage for entrypoint ([7b331df](https://github.com/finnmo/coles-personal-dashboard-picker/commit/7b331dfe5a92bde44085bdfc567507c1952f6f17))
+* **docker:** default DATABASE_URL in entrypoint if not set ([c8035ef](https://github.com/finnmo/coles-personal-dashboard-picker/commit/c8035ef4c0d78f6849c87441d0080663f9178308))
 * **docker:** exclude .env from image and fix password hash script ([caeb8a2](https://github.com/finnmo/coles-personal-dashboard-picker/commit/caeb8a24baf8a8df66405850c74046d5b91e6b4f))
 * **docker:** install openssl in deps and builder stages ([c16e1fc](https://github.com/finnmo/coles-personal-dashboard-picker/commit/c16e1fc5e9425ea2bd5e4334cde6ef03304b5371))
 * **docker:** resolve runtime issues in production container ([04215e8](https://github.com/finnmo/coles-personal-dashboard-picker/commit/04215e8f990f37abfc5a886b96ce819275f422ee))
