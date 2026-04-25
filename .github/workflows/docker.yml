@@ -49,8 +49,8 @@ jobs:
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,name=ghcr.io/${{ github.repository }},push-by-digest=true,name-canonical=true,push=true
-          cache-from: type=gha,scope=app-${{ matrix.platform }}
-          cache-to: type=gha,mode=max,scope=app-${{ matrix.platform }}
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:cache-${{ matrix.platform == 'linux/amd64' && 'amd64' || 'arm64' }}
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:cache-${{ matrix.platform == 'linux/amd64' && 'amd64' || 'arm64' }},mode=max,image-manifest=true,oci-mediatypes=true
 
       - name: Export digest
         run: |
@@ -146,5 +146,5 @@ jobs:
           tags: ${{ steps.meta-backup.outputs.tags }}
           labels: ${{ steps.meta-backup.outputs.labels }}
           platforms: linux/amd64,linux/arm64
-          cache-from: type=gha,scope=backup
-          cache-to: type=gha,mode=max,scope=backup
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}-backup:cache
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}-backup:cache,mode=max,image-manifest=true,oci-mediatypes=true
