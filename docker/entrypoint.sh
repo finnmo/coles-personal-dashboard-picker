@@ -34,7 +34,7 @@ if [ -z "$APP_PASSWORD_HASH" ]; then
   elif [ -n "$SETUP_PASSWORD" ]; then
     echo "[setup] Generating bcrypt hash from SETUP_PASSWORD..."
     APP_PASSWORD_HASH=$(node -e "
-const b = require('./node_modules/bcryptjs');
+const b = require('bcryptjs');
 b.hash(process.env.SETUP_PASSWORD, 10).then(h => {
   process.stdout.write(h);
   process.exit(0);

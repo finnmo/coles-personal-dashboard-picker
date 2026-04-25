@@ -37,6 +37,9 @@ COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 # Prisma CLI needed by entrypoint to run `prisma migrate deploy`
 COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
+# bcryptjs is inlined by the Next.js bundler so it's absent from standalone;
+# copy it explicitly so the entrypoint can hash SETUP_PASSWORD at first run
+COPY --from=deps /app/node_modules/bcryptjs ./node_modules/bcryptjs
 COPY docker/entrypoint.sh ./entrypoint.sh
 
 RUN chmod +x ./entrypoint.sh
