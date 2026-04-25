@@ -17,10 +17,17 @@
 │  Next.js API Routes                                  │
 │  /api/products  /api/search  /api/list  /api/auth    │
 │                        │                             │
-│        ┌───────────────┼───────────────┐             │
-│        ▼               ▼               ▼             │
+│        ┌───────────────┼────────────────┐            │
+│        ▼               ▼                ▼            │
 │   SQLite DB      Open Food Facts   List Provider     │
 │   (Prisma)      (openfoodfacts.org) (Reminders/Tasks)│
+│                        │                             │
+│              (search & names only)                   │
+│                        │                             │
+│                        ▼                             │
+│               Coles website scrape                   │
+│          (product image, on add only)                │
+│          falls back to OFF image URL                 │
 └─────────────────────────────────────────────────────┘
 ```
 

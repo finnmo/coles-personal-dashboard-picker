@@ -8,15 +8,11 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**.coles.com.au',
+        hostname: 'images.openfoodfacts.org',
       },
       {
         protocol: 'https',
-        hostname: '**.woolworths.com.au',
-      },
-      {
-        protocol: 'https',
-        hostname: '**.igashop.com.au',
+        hostname: 'cdn.productimages.coles.com.au',
       },
     ],
   },

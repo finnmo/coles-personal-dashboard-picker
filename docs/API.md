@@ -49,6 +49,11 @@ Body:    { name, imageUrl?, offProductId?, repurchaseIntervalDays? }
 409:     { error: "Product already exists" }
 ```
 
+The server attempts to fetch a higher-quality image from the Coles website before
+saving. It searches by `offProductId` (EAN barcode) first, then by `name`. If Coles
+returns a result the Coles CDN image URL is stored; otherwise the `imageUrl` from the
+request body (typically an Open Food Facts URL) is used as a fallback.
+
 ### PATCH /api/products/[id]
 
 ```
