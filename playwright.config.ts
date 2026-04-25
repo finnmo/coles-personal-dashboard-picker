@@ -33,6 +33,7 @@ export default defineConfig({
           SESSION_SECRET: process.env.SESSION_SECRET ?? '',
           LIST_PROVIDER: process.env.LIST_PROVIDER ?? 'apple_reminders',
           APPLE_SHORTCUTS_NAME: process.env.APPLE_SHORTCUTS_NAME ?? '',
+          E2E_PASSWORD: process.env.E2E_PASSWORD ?? '',
         }
       : {},
   },

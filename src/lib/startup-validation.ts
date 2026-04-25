@@ -68,6 +68,9 @@ export function validateEnv(): ValidationResult {
 }
 
 export function assertValidEnv(): void {
+  const sentryEnabled = !!process.env.SENTRY_DSN
+  console.info(`[startup] Sentry: ${sentryEnabled ? 'enabled' : 'disabled'}`)
+
   const result = validateEnv()
   if (!result.valid) {
     const message = [

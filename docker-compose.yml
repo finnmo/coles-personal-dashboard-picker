@@ -16,6 +16,19 @@ services:
       retries: 3
     restart: unless-stopped
 
+  backup:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backup
+    volumes:
+      - dashboard_data:/app/data
+    environment:
+      DB_PATH: /app/data/dashboard.db
+      BACKUP_DIR: /app/data/backups
+    depends_on:
+      - app
+    restart: unless-stopped
+
 volumes:
   dashboard_data:
     driver: local

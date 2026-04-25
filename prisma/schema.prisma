@@ -10,17 +10,37 @@ datasource db {
 
 // store is constrained to "COLES" | "IGA" in application code (SQLite has no enum support)
 model Product {
-  id                     String    @id @default(cuid())
+  id                     String            @id @default(cuid())
   name                   String
   imageUrl               String?
   store                  String
-  colesProductId         String?   @unique
-  igaProductId           String?   @unique
-  repurchaseIntervalDays Int       @default(14)
+  colesProductId         String?           @unique
+  igaProductId           String?           @unique
+  repurchaseIntervalDays Int               @default(14)
   lastPurchasedAt        DateTime?
-  createdAt              DateTime  @default(now())
-  updatedAt              DateTime  @updatedAt
+  createdAt              DateTime          @default(now())
+  updatedAt              DateTime          @updatedAt
+  deletedAt              DateTime?
+  shoppingListItem       ShoppingListItem?
+  purchaseEvents         PurchaseEvent[]
 
   @@index([store])
   @@index([lastPurchasedAt])
+  @@index([deletedAt])
+}
+
+model ShoppingListItem {
+  id        String   @id @default(cuid())
+  productId String   @unique
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  addedAt   DateTime @default(now())
+}
+
+model PurchaseEvent {
+  id          String   @id @default(cuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  purchasedAt DateTime @default(now())
+
+  @@index([productId, purchasedAt])
 }

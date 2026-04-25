@@ -1,7 +1,7 @@
 import { forwardRef } from 'react'
 import { clsx } from 'clsx'
 
-type ButtonVariant = 'primary' | 'ghost' | 'destructive'
+type ButtonVariant = 'primary' | 'ghost' | 'destructive' | 'outline'
 type ButtonSize = 'sm' | 'md' | 'lg'
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -14,6 +14,7 @@ const variantClasses: Record<ButtonVariant, string> = {
   primary: 'bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/80',
   ghost: 'bg-transparent hover:bg-muted text-foreground',
   destructive: 'bg-red-600 text-white hover:bg-red-700',
+  outline: 'border border-input bg-transparent hover:bg-muted text-foreground',
 }
 
 const sizeClasses: Record<ButtonSize, string> = {

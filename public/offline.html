@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Offline — Household Dashboard</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100dvh;
+      margin: 0;
+      background: #f9fafb;
+      color: #374151;
+      text-align: center;
+      padding: 1rem;
+    }
+    h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    p { color: #6b7280; max-width: 300px; }
+    button {
+      margin-top: 1.5rem;
+      padding: 0.625rem 1.25rem;
+      background: #e2001a;
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>You're offline</h1>
+  <p>The dashboard requires a connection to load fresh data. Please reconnect and try again.</p>
+  <button onclick="location.reload()">Try again</button>
+</body>
+</html>

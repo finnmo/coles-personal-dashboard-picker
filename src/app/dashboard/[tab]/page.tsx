@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { ProductGrid } from '@/components/dashboard/ProductGrid'
+import { ProductGridWithBoundary } from '@/components/dashboard/ProductGridWithBoundary'
 import { VALID_TABS, TAB_TO_STORE } from '@/lib/constants'
 import type { TabSlug } from '@/lib/constants'
 
@@ -16,5 +16,5 @@ export default function TabPage({ params }: PageProps) {
   if (!VALID_TABS.includes(tab)) notFound()
 
   const store = TAB_TO_STORE[tab]
-  return <ProductGrid store={store as 'COLES' | 'IGA'} />
+  return <ProductGridWithBoundary store={store as 'COLES' | 'IGA'} />
 }

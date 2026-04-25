@@ -1,8 +1,15 @@
-import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { computePriority } from '@/lib/priority'
 import { fetchColesProductImage } from '@/lib/coles-api'
-import type { EnrichedProduct, Store } from '@/types/product'
+import { apiError, apiOk } from '@/lib/api-response'
+import { enrichProduct } from '@/lib/product-utils'
+import { createRateLimiter } from '@/lib/rate-limiter'
+import type { Store } from '@/types/product'
+
+const postLimiter = createRateLimiter({ windowMs: 60_000, maxRequests: 30 })
+
+function getIp(request: Request): string {
+  return request.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? 'unknown'
+}
 
 const VALID_STORES: Store[] = ['COLES', 'IGA']
 
@@ -10,76 +17,54 @@ function isValidStore(value: string): value is Store {
   return VALID_STORES.includes(value as Store)
 }
 
-function enrich(product: {
-  id: string
-  name: string
-  imageUrl: string | null
-  store: string
-  colesProductId: string | null
-  igaProductId: string | null
-  repurchaseIntervalDays: number
-  lastPurchasedAt: Date | null
-  createdAt: Date
-  updatedAt: Date
-}): EnrichedProduct {
-  const priority = computePriority({
-    lastPurchasedAt: product.lastPurchasedAt,
-    repurchaseIntervalDays: product.repurchaseIntervalDays,
-  })
-  return {
-    ...product,
-    store: product.store as Store,
-    lastPurchasedAt: product.lastPurchasedAt?.toISOString() ?? null,
-    createdAt: product.createdAt.toISOString(),
-    updatedAt: product.updatedAt.toISOString(),
-    ...priority,
-  }
-}
-
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const storeParam = searchParams.get('store')?.toUpperCase()
 
   if (storeParam && !isValidStore(storeParam)) {
-    return NextResponse.json(
-      { error: `Invalid store. Valid values: ${VALID_STORES.join(', ')}` },
-      { status: 400 }
+    return apiError(
+      `Invalid store. Valid values: ${VALID_STORES.join(', ')}`,
+      'VALIDATION_ERROR',
+      400
     )
   }
 
   const products = await db.product.findMany({
-    where: storeParam ? { store: storeParam } : undefined,
+    where: {
+      ...(storeParam ? { store: storeParam } : {}),
+      deletedAt: null,
+    },
     orderBy: { createdAt: 'desc' },
   })
 
-  const enriched = products.map(enrich).sort((a, b) => {
+  const enriched = products.map(enrichProduct).sort((a, b) => {
     if (a.isNew && !b.isNew) return 1
     if (!a.isNew && b.isNew) return -1
     return b.priorityScore - a.priorityScore
   })
 
-  return NextResponse.json({ products: enriched })
+  return apiOk({ products: enriched })
 }
 
 export async function POST(request: Request) {
+  const limit = postLimiter.check(getIp(request))
+  if (!limit.allowed) return apiError('Too many requests', 'RATE_LIMITED', 429)
+
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+    return apiError('Invalid request body', 'VALIDATION_ERROR', 400)
   }
 
   const { name, imageUrl, store, colesProductId, igaProductId, repurchaseIntervalDays } =
     body as Record<string, unknown>
 
   if (!name || typeof name !== 'string') {
-    return NextResponse.json({ error: 'name is required' }, { status: 400 })
+    return apiError('name is required', 'VALIDATION_ERROR', 400)
   }
   if (!store || !isValidStore(String(store))) {
-    return NextResponse.json(
-      { error: `store must be one of: ${VALID_STORES.join(', ')}` },
-      { status: 400 }
-    )
+    return apiError(`store must be one of: ${VALID_STORES.join(', ')}`, 'VALIDATION_ERROR', 400)
   }
 
   try {
@@ -104,11 +89,11 @@ export async function POST(request: Request) {
             : 14,
       },
     })
-    return NextResponse.json({ product: enrich(product) }, { status: 201 })
+    return apiOk({ product: enrichProduct(product) }, 201)
   } catch (err) {
     const e = err as { code?: string }
     if (e.code === 'P2002') {
-      return NextResponse.json({ error: 'A product with that ID already exists' }, { status: 409 })
+      return apiError('A product with that ID already exists', 'CONFLICT', 409)
     }
     throw err
   }

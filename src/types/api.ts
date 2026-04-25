@@ -1,5 +1,16 @@
+export type ApiErrorCode =
+  | 'VALIDATION_ERROR'
+  | 'NOT_FOUND'
+  | 'CONFLICT'
+  | 'UPSTREAM_ERROR'
+  | 'RATE_LIMITED'
+  | 'SERVER_ERROR'
+  | 'UNAUTHORISED'
+  | 'NOT_IMPLEMENTED'
+
 export type ApiError = {
   error: string
+  code: string
 }
 
 export type ApiOk = {
@@ -11,3 +22,7 @@ export type LoginRequest = {
 }
 
 export type LoginResponse = ApiOk | ApiError
+
+export type PurchaseHistoryResponse = {
+  history: Array<{ id: string; purchasedAt: string }>
+}

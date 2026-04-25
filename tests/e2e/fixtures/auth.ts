@@ -7,6 +7,24 @@ async function login(page: Page, password = process.env.E2E_PASSWORD ?? 'e2e-tes
   await page.waitForURL('/dashboard/coles')
 }
 
+async function seedProduct(
+  page: Page,
+  data: { name: string; store: 'COLES' | 'IGA'; repurchaseIntervalDays?: number }
+): Promise<{ id: string; cleanup: () => Promise<void> }> {
+  const res = await page.request.post('/api/products', {
+    data: { repurchaseIntervalDays: 14, ...data },
+  })
+  if (!res.ok()) {
+    const body = await res.text()
+    throw new Error(`seedProduct failed (${res.status()}): ${body}`)
+  }
+  const { product } = await res.json()
+  return {
+    id: product.id,
+    cleanup: () => page.request.delete(`/api/products/${product.id}`).then(() => undefined),
+  }
+}
+
 export const test = base.extend<{ authenticatedPage: Page }>({
   authenticatedPage: async ({ page }, use) => {
     await login(page)
@@ -15,4 +33,4 @@ export const test = base.extend<{ authenticatedPage: Page }>({
 })
 
 export { expect } from '@playwright/test'
-export { login }
+export { login, seedProduct }

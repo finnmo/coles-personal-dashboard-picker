@@ -7,9 +7,19 @@ interface IntervalEditorProps {
   productId: string
   currentInterval: number
   onSave: (productId: string, days: number) => Promise<void>
+  bulkMode?: boolean
+  bulkValue?: number
+  onBulkChange?: (days: number) => void
 }
 
-export function IntervalEditor({ productId, currentInterval, onSave }: IntervalEditorProps) {
+export function IntervalEditor({
+  productId,
+  currentInterval,
+  onSave,
+  bulkMode,
+  bulkValue,
+  onBulkChange,
+}: IntervalEditorProps) {
   const [editing, setEditing] = useState(false)
   const [value, setValue] = useState(String(currentInterval))
   const [saving, setSaving] = useState(false)
@@ -21,6 +31,23 @@ export function IntervalEditor({ productId, currentInterval, onSave }: IntervalE
     await onSave(productId, days)
     setSaving(false)
     setEditing(false)
+  }
+
+  if (bulkMode) {
+    return (
+      <div className="flex items-center gap-1">
+        <input
+          type="number"
+          min="1"
+          max="365"
+          value={bulkValue ?? currentInterval}
+          onChange={(e) => onBulkChange?.(parseInt(e.target.value, 10) || currentInterval)}
+          className="h-7 w-16 rounded border border-input bg-card px-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+          data-testid={`interval-bulk-${productId}`}
+        />
+        <span className="text-xs text-muted-foreground">days</span>
+      </div>
+    )
   }
 
   if (!editing) {

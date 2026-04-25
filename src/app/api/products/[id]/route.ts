@@ -1,53 +1,36 @@
-import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { computePriority } from '@/lib/priority'
-import type { Store } from '@/types/product'
+import { apiError, apiOk } from '@/lib/api-response'
+import { enrichProduct } from '@/lib/product-utils'
+import { createRateLimiter } from '@/lib/rate-limiter'
+
+const mutationLimiter = createRateLimiter({ windowMs: 60_000, maxRequests: 30 })
+
+function getIp(request: Request): string {
+  return request.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? 'unknown'
+}
 
 interface Params {
   params: { id: string }
 }
 
-function enrich(product: {
-  id: string
-  name: string
-  imageUrl: string | null
-  store: string
-  colesProductId: string | null
-  igaProductId: string | null
-  repurchaseIntervalDays: number
-  lastPurchasedAt: Date | null
-  createdAt: Date
-  updatedAt: Date
-}) {
-  const priority = computePriority({
-    lastPurchasedAt: product.lastPurchasedAt,
-    repurchaseIntervalDays: product.repurchaseIntervalDays,
-  })
-  return {
-    ...product,
-    store: product.store as Store,
-    lastPurchasedAt: product.lastPurchasedAt?.toISOString() ?? null,
-    createdAt: product.createdAt.toISOString(),
-    updatedAt: product.updatedAt.toISOString(),
-    ...priority,
-  }
-}
-
 export async function GET(_request: Request, { params }: Params) {
-  const product = await db.product.findUnique({ where: { id: params.id } })
-  if (!product) return NextResponse.json({ error: 'Not found' }, { status: 404 })
-  return NextResponse.json({ product: enrich(product) })
+  const product = await db.product.findFirst({ where: { id: params.id, deletedAt: null } })
+  if (!product) return apiError('Not found', 'NOT_FOUND', 404)
+  return apiOk({ product: enrichProduct(product) })
 }
 
 export async function PATCH(request: Request, { params }: Params) {
-  const existing = await db.product.findUnique({ where: { id: params.id } })
-  if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  const limit = mutationLimiter.check(getIp(request))
+  if (!limit.allowed) return apiError('Too many requests', 'RATE_LIMITED', 429)
+
+  const existing = await db.product.findFirst({ where: { id: params.id, deletedAt: null } })
+  if (!existing) return apiError('Not found', 'NOT_FOUND', 404)
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+    return apiError('Invalid request body', 'VALIDATION_ERROR', 400)
   }
 
   const { name, imageUrl, repurchaseIntervalDays, lastPurchasedAt } = body as Record<
@@ -69,13 +52,16 @@ export async function PATCH(request: Request, { params }: Params) {
     },
   })
 
-  return NextResponse.json({ product: enrich(product) })
+  return apiOk({ product: enrichProduct(product) })
 }
 
-export async function DELETE(_request: Request, { params }: Params) {
-  const existing = await db.product.findUnique({ where: { id: params.id } })
-  if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+export async function DELETE(request: Request, { params }: Params) {
+  const limit = mutationLimiter.check(getIp(request))
+  if (!limit.allowed) return apiError('Too many requests', 'RATE_LIMITED', 429)
 
-  await db.product.delete({ where: { id: params.id } })
-  return NextResponse.json({ ok: true })
+  const existing = await db.product.findFirst({ where: { id: params.id, deletedAt: null } })
+  if (!existing) return apiError('Not found', 'NOT_FOUND', 404)
+
+  await db.product.update({ where: { id: params.id }, data: { deletedAt: new Date() } })
+  return apiOk({ ok: true })
 }

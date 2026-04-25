@@ -1,0 +1,174 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>household-dashboard</Name>
+  <Repository>ghcr.io/finnmo/coles-personal-dashboard-picker:latest</Repository>
+  <Registry>https://ghcr.io</Registry>
+  <Network>bridge</Network>
+  <Shell>sh</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/finnmo/coles-personal-dashboard-picker/issues</Support>
+  <Project>https://github.com/finnmo/coles-personal-dashboard-picker</Project>
+  <Overview>
+    Wall-mounted household grocery dashboard for Coles and IGA.
+    Tap products to add them to your shopping list (Apple Reminders or Google Tasks).
+    Curate your product list via the built-in search panel.
+    Designed for an iPad mounted on the wall, running on your local network.
+  </Overview>
+  <Category>HomeAutomation: Tools:</Category>
+  <WebUI>http://[IP]:[PORT:3000]/</WebUI>
+  <Icon>https://raw.githubusercontent.com/finnmo/coles-personal-dashboard-picker/main/public/icons/icon-192.png</Icon>
+  <ExtraParams>--restart=unless-stopped</ExtraParams>
+
+  <!-- Port -->
+  <Config
+    Name="Web UI Port"
+    Target="3000"
+    Default="3000"
+    Mode="tcp"
+    Description="Port the dashboard is accessible on. Open this in your browser after starting."
+    Type="Port"
+    Display="always"
+    Required="true"
+    Mask="false">3000</Config>
+
+  <!-- Data volume -->
+  <Config
+    Name="Data Directory"
+    Target="/app/data"
+    Default="/mnt/user/appdata/household-dashboard"
+    Mode="rw"
+    Description="Where the SQLite database, backups, and auto-generated secrets are stored. Must be persistent across restarts."
+    Type="Path"
+    Display="always"
+    Required="true"
+    Mask="false">/mnt/user/appdata/household-dashboard</Config>
+
+  <!-- First-run password -->
+  <Config
+    Name="Setup Password"
+    Target="SETUP_PASSWORD"
+    Default=""
+    Mode=""
+    Description="Your dashboard password. Set this on first start — the container hashes it automatically and saves the hash. You can clear this variable after the first successful start."
+    Type="Variable"
+    Display="always"
+    Required="false"
+    Mask="true"></Config>
+
+  <!-- Session secret (optional — auto-generated) -->
+  <Config
+    Name="Session Secret"
+    Target="SESSION_SECRET"
+    Default=""
+    Mode=""
+    Description="Secret used to sign login tokens. Leave blank — a strong secret is auto-generated and persisted on first start."
+    Type="Variable"
+    Display="advanced"
+    Required="false"
+    Mask="true"></Config>
+
+  <!-- List provider -->
+  <Config
+    Name="List Provider"
+    Target="LIST_PROVIDER"
+    Default="apple_reminders"
+    Mode=""
+    Description="Where to send shopping list items. Options: apple_reminders (iOS Shortcuts) | google_tasks"
+    Type="Variable"
+    Display="always"
+    Required="true"
+    Mask="false">apple_reminders</Config>
+
+  <!-- Apple Reminders -->
+  <Config
+    Name="Apple Shortcuts Name"
+    Target="APPLE_SHORTCUTS_NAME"
+    Default="AddToShopping"
+    Mode=""
+    Description="Exact name of your iOS Shortcut. Required when List Provider is apple_reminders."
+    Type="Variable"
+    Display="always"
+    Required="false"
+    Mask="false">AddToShopping</Config>
+
+  <!-- Google Tasks -->
+  <Config
+    Name="Google Client ID"
+    Target="GOOGLE_CLIENT_ID"
+    Default=""
+    Mode=""
+    Description="OAuth2 Client ID. Required when List Provider is google_tasks."
+    Type="Variable"
+    Display="advanced"
+    Required="false"
+    Mask="false"></Config>
+
+  <Config
+    Name="Google Client Secret"
+    Target="GOOGLE_CLIENT_SECRET"
+    Default=""
+    Mode=""
+    Description="OAuth2 Client Secret. Required when List Provider is google_tasks."
+    Type="Variable"
+    Display="advanced"
+    Required="false"
+    Mask="true"></Config>
+
+  <Config
+    Name="Google Refresh Token"
+    Target="GOOGLE_REFRESH_TOKEN"
+    Default=""
+    Mode=""
+    Description="OAuth2 Refresh Token. Required when List Provider is google_tasks."
+    Type="Variable"
+    Display="advanced"
+    Required="false"
+    Mask="true"></Config>
+
+  <Config
+    Name="Google Task List ID"
+    Target="GOOGLE_TASK_LIST_ID"
+    Default=""
+    Mode=""
+    Description="ID of the Google Tasks list to add items to. Required when List Provider is google_tasks."
+    Type="Variable"
+    Display="advanced"
+    Required="false"
+    Mask="false"></Config>
+
+  <!-- Coles search -->
+  <Config
+    Name="RapidAPI Key"
+    Target="RAPIDAPI_KEY"
+    Default=""
+    Mode=""
+    Description="API key for Coles product search. Get a free key at rapidapi.com. Optional — only needed to add new Coles products."
+    Type="Variable"
+    Display="always"
+    Required="false"
+    Mask="true"></Config>
+
+  <!-- Optional tuning -->
+  <Config
+    Name="Log Level"
+    Target="LOG_LEVEL"
+    Default="info"
+    Mode=""
+    Description="Log verbosity: debug | info | warn | error"
+    Type="Variable"
+    Display="advanced"
+    Required="false"
+    Mask="false">info</Config>
+
+  <Config
+    Name="Session Expiry (hours)"
+    Target="SESSION_EXPIRY_HOURS"
+    Default="24"
+    Mode=""
+    Description="How long a login session lasts before requiring re-authentication."
+    Type="Variable"
+    Display="advanced"
+    Required="false"
+    Mask="false">24</Config>
+
+</Container>

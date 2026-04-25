@@ -1,0 +1,11 @@
+FROM alpine:3.19
+
+RUN apk add --no-cache dcron sqlite
+
+COPY docker/backup.sh /usr/local/bin/backup.sh
+RUN chmod +x /usr/local/bin/backup.sh
+
+# Run backup at 2am daily
+RUN echo "0 2 * * * /usr/local/bin/backup.sh >> /var/log/backup.log 2>&1" | crontab -
+
+CMD ["crond", "-f", "-l", "6"]

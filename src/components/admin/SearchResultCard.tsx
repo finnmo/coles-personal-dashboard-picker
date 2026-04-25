@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { Plus, Check, Loader2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import type { ColesSearchResult } from '@/lib/coles-api'
 
 interface SearchResultCardProps {
@@ -55,22 +54,25 @@ export function SearchResultCard({ result, alreadyAdded, onAdd }: SearchResultCa
         </div>
       </div>
 
-      <Button
-        variant={alreadyAdded ? 'ghost' : 'primary'}
-        size="sm"
+      <button
         disabled={alreadyAdded || isAdding}
         onClick={handleAdd}
         data-testid={`add-btn-${result.colesProductId}`}
         aria-label={alreadyAdded ? 'Already added' : `Add ${result.name}`}
+        className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl transition-colors ${
+          alreadyAdded
+            ? 'bg-muted text-muted-foreground'
+            : 'bg-primary text-primary-foreground active:opacity-70'
+        }`}
       >
         {isAdding ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
+          <Loader2 className="h-5 w-5 animate-spin" />
         ) : alreadyAdded ? (
-          <Check className="h-4 w-4" />
+          <Check className="h-5 w-5" />
         ) : (
-          <Plus className="h-4 w-4" />
+          <Plus className="h-5 w-5" />
         )}
-      </Button>
+      </button>
     </div>
   )
 }
