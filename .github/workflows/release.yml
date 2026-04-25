@@ -21,7 +21,7 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - name: Generate CHANGELOG
-        run: npx conventional-changelog-cli -p angular -i CHANGELOG.md -s
+        run: npx conventional-changelog -p angular -i CHANGELOG.md -s
       - name: Commit CHANGELOG
         run: |
           git config user.name "github-actions[bot]"
