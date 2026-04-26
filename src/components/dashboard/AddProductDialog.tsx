@@ -117,7 +117,7 @@ export function AddProductDialog({ open, onClose }: AddProductDialogProps) {
             <h2 className="text-lg font-bold text-foreground">Add Products</h2>
             <button
               onClick={close}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-muted active:bg-muted/70 transition-colors"
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-muted active:bg-muted/70 transition-colors"
               aria-label="Close"
             >
               <X className="h-5 w-5 text-foreground" />

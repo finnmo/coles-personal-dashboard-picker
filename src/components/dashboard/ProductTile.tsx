@@ -50,8 +50,9 @@ export function ProductTile({ product, onPurchased }: ProductTileProps) {
       className="group relative flex cursor-pointer flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm active:scale-[0.97] active:shadow-none transition-transform duration-100 select-none"
       data-testid={`product-tile-${product.id}`}
     >
-      {/* Product image */}
-      <div className="relative aspect-square w-full overflow-hidden bg-muted">
+      {/* Product image — padding-bottom trick for square aspect ratio without
+          CSS aspect-ratio (unsupported in iOS 12 Safari / Safari < 15) */}
+      <div className="relative w-full overflow-hidden bg-muted" style={{ paddingBottom: '100%' }}>
         {product.imageUrl ? (
           <Image
             src={product.imageUrl}
@@ -62,7 +63,7 @@ export function ProductTile({ product, onPurchased }: ProductTileProps) {
             draggable={false}
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-3xl text-muted-foreground">
+          <div className="absolute inset-0 flex items-center justify-center text-3xl text-muted-foreground">
             🛒
           </div>
         )}

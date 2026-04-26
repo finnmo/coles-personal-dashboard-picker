@@ -119,7 +119,7 @@ function SwipeableItem({ item, onRemove }: SwipeableItemProps) {
         <button
           onClick={() => onRemove(item.id)}
           aria-label={`Remove ${item.product.name}`}
-          className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-muted-foreground active:bg-muted active:text-red-500 transition-colors"
+          className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full text-muted-foreground active:bg-muted active:text-red-500 transition-colors"
         >
           <X className="h-5 w-5" />
         </button>
@@ -346,7 +346,7 @@ export function ShoppingListPanel() {
                       onClick={handleShare}
                       aria-label="Share list"
                       data-testid="share-list-btn"
-                      className="flex items-center space-x-2 rounded-xl px-4 py-3 text-base font-medium text-muted-foreground active:bg-muted transition-colors disabled:opacity-50"
+                      className="flex h-12 items-center space-x-2 rounded-xl px-4 text-base font-medium text-muted-foreground active:bg-muted transition-colors disabled:opacity-50"
                     >
                       <Share2 className="h-5 w-5" />
                       Share
@@ -354,7 +354,7 @@ export function ShoppingListPanel() {
                     <button
                       onClick={clearAll}
                       data-testid="clear-list-btn"
-                      className="flex items-center space-x-1.5 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground active:bg-muted transition-colors"
+                      className="flex h-12 items-center space-x-1.5 rounded-lg px-3 text-sm font-medium text-muted-foreground active:bg-muted transition-colors"
                     >
                       <Trash2 className="h-4 w-4" />
                       Clear all
@@ -363,7 +363,7 @@ export function ShoppingListPanel() {
                 )}
                 <button
                   onClick={close}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-muted active:bg-muted/70 transition-colors"
+                  className="flex h-12 w-12 items-center justify-center rounded-full bg-muted active:bg-muted/70 transition-colors"
                   aria-label="Close"
                 >
                   <X className="h-5 w-5 text-foreground" />
