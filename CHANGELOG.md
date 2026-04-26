@@ -21,6 +21,7 @@
 * **prisma:** add linux-musl openssl-3.0.x binary targets for Alpine ([e5e61c4](https://github.com/finnmo/coles-personal-dashboard-picker/commit/e5e61c449596c11e1a7cf87e84123f4b87ddd8ec))
 * product tile images and larger touch targets for iPad ([642be4f](https://github.com/finnmo/coles-personal-dashboard-picker/commit/642be4f2e00005bf869d577316097009d33352ef))
 * **release:** switch to TriPSs/conventional-changelog-action to avoid broken CLI ([1598ee8](https://github.com/finnmo/coles-personal-dashboard-picker/commit/1598ee816c040e3cb6050534ba2444dd5e2aa752))
+* remove auth remnants from entrypoint and Dockerfile ([4f95fab](https://github.com/finnmo/coles-personal-dashboard-picker/commit/4f95fabb1f8390f5877a1feda2f2e0cc4b14583a))
 * skip changelog action gracefully when nothing to commit ([f138858](https://github.com/finnmo/coles-personal-dashboard-picker/commit/f1388584d8409e8510e4e143b8f26895ceed1e02))
 * use Host header for login redirects to avoid Docker 0.0.0.0 address ([4df3191](https://github.com/finnmo/coles-personal-dashboard-picker/commit/4df31911f90a71e78c8b7765731fef968da6117e))
 
