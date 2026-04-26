@@ -1,10 +1,9 @@
-import { test, expect, login, seedProduct } from './fixtures/auth'
+import { test, expect, seedProduct } from './fixtures/auth'
 
 test.describe('Shopping List Panel', () => {
   let cleanup: () => Promise<void>
 
   test.beforeEach(async ({ page }) => {
-    await login(page)
     const seeded = await seedProduct(page, { name: 'E2E List Milk' })
     cleanup = seeded.cleanup
     await page.goto('/dashboard')

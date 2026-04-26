@@ -3,11 +3,13 @@ import { SignJWT, jwtVerify } from 'jose'
 const ALGORITHM = 'HS256'
 const EXPIRY = '24h'
 
+// Generate a random fallback so share tokens work without any configuration.
+// Tokens will be invalidated on server restart when no SHARE_SECRET is set,
+// which is fine for a local-only deployment.
+const fallbackSecret = crypto.randomUUID().replace(/-/g, '') + crypto.randomUUID().replace(/-/g, '')
+
 function getSecret(): Uint8Array {
-  const secret = process.env.SESSION_SECRET
-  if (!secret || secret.length < 32) {
-    throw new Error('SESSION_SECRET must be set and at least 32 characters long')
-  }
+  const secret = process.env.SHARE_SECRET ?? fallbackSecret
   return new TextEncoder().encode(secret)
 }
 

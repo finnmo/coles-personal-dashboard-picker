@@ -3,12 +3,12 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { createShareToken, verifyShareToken } from '@/lib/share-token'
 
 beforeEach(() => {
-  process.env.SESSION_SECRET = 'test-secret-that-is-at-least-32-chars-long!!'
+  process.env.SHARE_SECRET = 'test-share-secret-that-is-at-least-32-chars!!'
 })
 
 afterEach(() => {
   vi.useRealTimers()
-  delete process.env.SESSION_SECRET
+  delete process.env.SHARE_SECRET
 })
 
 describe('createShareToken / verifyShareToken', () => {
@@ -23,16 +23,6 @@ describe('createShareToken / verifyShareToken', () => {
     // Advance 25 hours
     vi.advanceTimersByTime(25 * 60 * 60 * 1000)
     expect(await verifyShareToken(token)).toBe(false)
-  })
-
-  it('session token with wrong type returns false', async () => {
-    const { SignJWT } = await import('jose')
-    const secret = new TextEncoder().encode(process.env.SESSION_SECRET)
-    const sessionToken = await new SignJWT({ authenticated: true })
-      .setProtectedHeader({ alg: 'HS256' })
-      .setExpirationTime('24h')
-      .sign(secret)
-    expect(await verifyShareToken(sessionToken)).toBe(false)
   })
 
   it('garbage string returns false', async () => {

@@ -1,11 +1,11 @@
-import { test, expect, login, seedProduct } from './fixtures/auth'
+import { test, expect, seedProduct } from './fixtures/auth'
 
 test.describe('Dashboard', () => {
   test.beforeEach(async ({ page }) => {
-    await login(page)
+    await page.goto('/dashboard')
   })
 
-  test('lands on /dashboard after login', async ({ page }) => {
+  test('loads the dashboard', async ({ page }) => {
     await expect(page).toHaveURL(/\/dashboard/)
   })
 
@@ -16,11 +16,6 @@ test.describe('Dashboard', () => {
     await expect(html).toHaveClass(/dark/)
     await toggle.click()
     await expect(html).not.toHaveClass(/dark/)
-  })
-
-  test('logout button redirects to /login', async ({ page }) => {
-    await page.getByTestId('logout-button').click()
-    await expect(page).toHaveURL(/\/login/)
   })
 
   test('Add button opens the Add Product dialog', async ({ page }) => {
@@ -41,7 +36,6 @@ test.describe('Dashboard — product interaction', () => {
   let cleanup: () => Promise<void>
 
   test.beforeEach(async ({ page }) => {
-    await login(page)
     const seeded = await seedProduct(page, { name: 'E2E Milk' })
     cleanup = seeded.cleanup
     await page.goto('/dashboard')

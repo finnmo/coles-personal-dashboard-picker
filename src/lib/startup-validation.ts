@@ -11,21 +11,8 @@ export function validateEnv(): ValidationResult {
   const errors: string[] = []
   const env = process.env
 
-  // Core
   if (!env.DATABASE_URL) {
     errors.push('DATABASE_URL is required')
-  }
-
-  if (!env.SESSION_SECRET) {
-    errors.push('SESSION_SECRET is required')
-  } else if (env.SESSION_SECRET.length < 32) {
-    errors.push('SESSION_SECRET must be at least 32 characters long')
-  }
-
-  if (!env.APP_PASSWORD_HASH) {
-    errors.push(
-      'APP_PASSWORD_HASH is required — generate with: npx tsx scripts/generate-password-hash.ts <password>'
-    )
   }
 
   // List provider

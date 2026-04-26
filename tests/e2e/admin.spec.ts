@@ -1,4 +1,5 @@
-import { test, expect, login } from './fixtures/auth'
+import { test, expect } from './fixtures/auth'
+import type { Page } from '@playwright/test'
 
 function makeMockResult(offProductId: string) {
   return {
@@ -10,7 +11,7 @@ function makeMockResult(offProductId: string) {
   }
 }
 
-async function cleanProductByOffId(page: Parameters<typeof login>[0], offProductId: string) {
+async function cleanProductByOffId(page: Page, offProductId: string) {
   const res = await page.request.get('/api/products')
   const { products } = await res.json()
   const found = products.find(
@@ -23,7 +24,6 @@ async function cleanProductByOffId(page: Parameters<typeof login>[0], offProduct
 
 test.describe('Admin Panel', () => {
   test.beforeEach(async ({ page }) => {
-    await login(page)
     await page.goto('/admin')
   })
 
@@ -41,7 +41,6 @@ test.describe('Admin Search', () => {
 
   test.beforeEach(async ({ page }) => {
     searchProductId = `900${Date.now()}`
-    await login(page)
 
     await page.route('/api/search*', async (route) => {
       await route.fulfill({
@@ -93,8 +92,6 @@ test.describe('Admin Product Management', () => {
   let productId: string
 
   test.beforeEach(async ({ page }) => {
-    await login(page)
-
     const res = await page.request.post('/api/products', {
       data: {
         name: 'E2E Test Milk',

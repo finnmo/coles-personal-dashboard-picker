@@ -1,11 +1,9 @@
-import { test, expect, login } from './fixtures/auth'
+import { test, expect } from './fixtures/auth'
+import type { Page } from '@playwright/test'
 
 const DAY_MS = 1000 * 60 * 60 * 24
 
-async function seedProduct(
-  page: Parameters<typeof login>[0],
-  overrides: Record<string, unknown> = {}
-) {
+async function seedProduct(page: Page, overrides: Record<string, unknown> = {}) {
   const res = await page.request.post('/api/products', {
     data: {
       name: `E2E Product ${Date.now()}`,
@@ -20,7 +18,7 @@ async function seedProduct(
   return product as { id: string; name: string }
 }
 
-async function setLastPurchased(page: Parameters<typeof login>[0], id: string, daysAgo: number) {
+async function setLastPurchased(page: Page, id: string, daysAgo: number) {
   const lastPurchasedAt = new Date(Date.now() - daysAgo * DAY_MS).toISOString()
   const res = await page.request.patch(`/api/products/${id}`, {
     data: { lastPurchasedAt },
@@ -35,8 +33,6 @@ test.describe('Dashboard — purchase tracking', () => {
   let overdueProductId: string
 
   test.beforeEach(async ({ page }) => {
-    await login(page)
-
     const now = Date.now()
     // New product (never purchased)
     const newP = await seedProduct(page, { name: `New Item ${now}` })

@@ -4,8 +4,6 @@ import { validateEnv, assertValidEnv } from '@/lib/startup-validation'
 
 const VALID_BASE = {
   DATABASE_URL: 'file:./data/test.db',
-  SESSION_SECRET: 'test-secret-that-is-at-least-32-characters',
-  APP_PASSWORD_HASH: '$2b$10$somehash',
   LIST_PROVIDER: 'apple_reminders',
   APPLE_SHORTCUTS_NAME: 'TestShortcut',
 }
@@ -59,27 +57,6 @@ describe('validateEnv', () => {
     if (!result.valid) expect(result.errors).toContain('DATABASE_URL is required')
   })
 
-  it('errors when SESSION_SECRET is missing', () => {
-    setEnv({ SESSION_SECRET: undefined })
-    const result = validateEnv()
-    expect(result.valid).toBe(false)
-    if (!result.valid) expect(result.errors.some((e) => e.includes('SESSION_SECRET'))).toBe(true)
-  })
-
-  it('errors when SESSION_SECRET is shorter than 32 chars', () => {
-    setEnv({ SESSION_SECRET: 'tooshort' })
-    const result = validateEnv()
-    expect(result.valid).toBe(false)
-    if (!result.valid) expect(result.errors.some((e) => e.includes('32 characters'))).toBe(true)
-  })
-
-  it('errors when APP_PASSWORD_HASH is missing', () => {
-    setEnv({ APP_PASSWORD_HASH: undefined })
-    const result = validateEnv()
-    expect(result.valid).toBe(false)
-    if (!result.valid) expect(result.errors.some((e) => e.includes('APP_PASSWORD_HASH'))).toBe(true)
-  })
-
   it('errors when LIST_PROVIDER is missing', () => {
     setEnv({ LIST_PROVIDER: undefined })
     const result = validateEnv()
@@ -113,7 +90,7 @@ describe('validateEnv', () => {
     clearEnv()
     const result = validateEnv()
     expect(result.valid).toBe(false)
-    if (!result.valid) expect(result.errors.length).toBeGreaterThan(2)
+    if (!result.valid) expect(result.errors.length).toBeGreaterThanOrEqual(2)
   })
 })
 
