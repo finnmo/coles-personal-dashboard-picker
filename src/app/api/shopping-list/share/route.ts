@@ -10,6 +10,10 @@ function getClientIp(request: Request): string {
 }
 
 function getLanIp(): string | null {
+  // Explicit override — required when running inside Docker where os.networkInterfaces()
+  // only sees the bridge IP (172.17.x.x), not the host's real LAN address.
+  if (process.env.SHARE_HOST) return process.env.SHARE_HOST
+
   const ifaces = os.networkInterfaces()
   for (const name of Object.keys(ifaces)) {
     // Skip loopback and virtual Docker/bridge interfaces
@@ -17,7 +21,8 @@ function getLanIp(): string | null {
       name === 'lo' ||
       name.startsWith('docker') ||
       name.startsWith('br-') ||
-      name.startsWith('veth')
+      name.startsWith('veth') ||
+      name.startsWith('eth')
     )
       continue
     for (const iface of ifaces[name] ?? []) {

@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback } from 'react'
 import Image from 'next/image'
 import useSWR from 'swr'
-import { ShoppingCart, X, Trash2, Share2, Copy, Check } from 'lucide-react'
+import { ShoppingCart, X, Trash2, Share2, AlignLeft, Smartphone, ChevronLeft } from 'lucide-react'
 import { QrCode } from './QrCode'
 
 type ShoppingListProduct = {
@@ -128,12 +128,14 @@ function SwipeableItem({ item, onRemove }: SwipeableItemProps) {
   )
 }
 
+type ShareView = 'choose' | 'text' | 'link'
+
 export function ShoppingListPanel() {
   const [open, setOpen] = useState(false)
   const [closing, setClosing] = useState(false)
+  const [shareView, setShareView] = useState<ShareView | null>(null)
   const [shareUrl, setShareUrl] = useState<string | null>(null)
-  const [copied, setCopied] = useState(false)
-  const [sharing, setSharing] = useState(false)
+  const [linkLoading, setLinkLoading] = useState(false)
 
   const { data, mutate } = useSWR<{ items: ShoppingListItemData[] }>(
     open ? '/api/shopping-list' : null,
@@ -143,12 +145,20 @@ export function ShoppingListPanel() {
 
   const items = data?.items ?? []
 
+  function buildListText() {
+    return ['Shopping List', ...items.map((item) => `• ${item.product.name}`)].join('\n')
+  }
+
+  function closeShareModal() {
+    setShareView(null)
+  }
+
   function close() {
     setClosing(true)
     setTimeout(() => {
       setOpen(false)
       setClosing(false)
-      setShareUrl(null)
+      setShareView(null)
     }, 240)
   }
 
@@ -163,27 +173,22 @@ export function ShoppingListPanel() {
     close()
   }
 
-  async function handleShare() {
-    if (sharing) return
-    setSharing(true)
+  function handleShare() {
+    setShareView('choose')
+  }
+
+  async function openLinkQr() {
+    setShareView('link')
+    if (shareUrl) return
+    setLinkLoading(true)
     try {
       const res = await fetch('/api/shopping-list/share', { method: 'POST' })
       if (!res.ok) return
       const { token, shareUrl: lanUrl } = await res.json()
-      // Prefer the server-detected LAN IP so the link works from other devices.
-      // Fall back to window.location.origin only if LAN IP detection failed.
-      const url = lanUrl ?? `${window.location.origin}/list/${token}`
-      setShareUrl(url)
+      setShareUrl(lanUrl ?? `${window.location.origin}/list/${token}`)
     } finally {
-      setSharing(false)
+      setLinkLoading(false)
     }
-  }
-
-  async function copyToClipboard() {
-    if (!shareUrl) return
-    await navigator.clipboard.writeText(shareUrl)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
   }
 
   return (
@@ -200,41 +205,106 @@ export function ShoppingListPanel() {
       {/* Item count badge */}
       <ShoppingListBadge />
 
-      {/* QR code full-screen modal */}
-      {shareUrl && (
+      {/* Share modal */}
+      {shareView && (
         <>
           <div
             className="fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm"
-            onClick={() => {
-              setShareUrl(null)
-              setCopied(false)
-            }}
+            onClick={closeShareModal}
             aria-hidden
           />
-          <div className="fixed inset-0 z-[70] flex items-center justify-center p-8 pointer-events-none">
+          <div className="fixed inset-0 z-[70] flex items-center justify-center p-6 pointer-events-none">
             <div
-              className="pointer-events-auto flex flex-col items-center gap-6 rounded-3xl bg-card p-10 shadow-2xl w-full max-w-sm"
+              className="pointer-events-auto flex flex-col items-center gap-5 rounded-3xl bg-card p-8 shadow-2xl w-full max-w-sm"
               onClick={(e) => e.stopPropagation()}
             >
-              <h2 className="text-2xl font-bold text-foreground">Share List</h2>
-              <QrCode url={shareUrl} size={260} />
-              <p className="text-base text-muted-foreground">Scan to view · Expires in 24h</p>
-              <button
-                onClick={copyToClipboard}
-                className="flex items-center gap-2 rounded-xl bg-primary px-6 py-4 text-lg font-semibold text-white active:scale-95 transition-transform w-full justify-center"
-              >
-                {copied ? <Check className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
-                {copied ? 'Copied!' : 'Copy link'}
-              </button>
-              <button
-                onClick={() => {
-                  setShareUrl(null)
-                  setCopied(false)
-                }}
-                className="text-base text-muted-foreground underline-offset-4 hover:underline py-2"
-              >
-                Close
-              </button>
+              {shareView === 'choose' && (
+                <>
+                  <h2 className="text-2xl font-bold text-foreground">Share List</h2>
+                  <button
+                    onClick={() => setShareView('text')}
+                    className="flex items-center gap-4 w-full rounded-2xl border border-border px-5 py-4 text-left active:bg-muted transition-colors"
+                  >
+                    <AlignLeft className="h-6 w-6 shrink-0 text-primary" />
+                    <div>
+                      <p className="font-semibold text-foreground">Plain list</p>
+                      <p className="text-sm text-muted-foreground">Any camera reads it as text</p>
+                    </div>
+                  </button>
+                  <button
+                    onClick={openLinkQr}
+                    className="flex items-center gap-4 w-full rounded-2xl border border-border px-5 py-4 text-left active:bg-muted transition-colors"
+                  >
+                    <Smartphone className="h-6 w-6 shrink-0 text-primary" />
+                    <div>
+                      <p className="font-semibold text-foreground">Save to phone</p>
+                      <p className="text-sm text-muted-foreground">
+                        Opens Reminders, Notes &amp; more
+                      </p>
+                    </div>
+                  </button>
+                  <button
+                    onClick={closeShareModal}
+                    className="text-sm text-muted-foreground underline-offset-4 hover:underline py-1"
+                  >
+                    Cancel
+                  </button>
+                </>
+              )}
+
+              {shareView === 'text' && (
+                <>
+                  <h2 className="text-xl font-bold text-foreground">Plain List</h2>
+                  <QrCode value={buildListText()} size={240} />
+                  <p className="text-sm text-muted-foreground text-center">
+                    Scan with any camera app
+                  </p>
+                  <div className="flex w-full items-center justify-between">
+                    <button
+                      onClick={() => setShareView('choose')}
+                      className="flex items-center gap-1 text-sm text-muted-foreground hover:underline"
+                    >
+                      <ChevronLeft className="h-4 w-4" /> Back
+                    </button>
+                    <button
+                      onClick={closeShareModal}
+                      className="text-sm text-muted-foreground hover:underline"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {shareView === 'link' && (
+                <>
+                  <h2 className="text-xl font-bold text-foreground">Save to Phone</h2>
+                  {linkLoading || !shareUrl ? (
+                    <div className="flex h-60 w-60 items-center justify-center">
+                      <div className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
+                    </div>
+                  ) : (
+                    <QrCode value={shareUrl} size={240} />
+                  )}
+                  <p className="text-sm text-muted-foreground text-center">
+                    Scan to open save options on your phone
+                  </p>
+                  <div className="flex w-full items-center justify-between">
+                    <button
+                      onClick={() => setShareView('choose')}
+                      className="flex items-center gap-1 text-sm text-muted-foreground hover:underline"
+                    >
+                      <ChevronLeft className="h-4 w-4" /> Back
+                    </button>
+                    <button
+                      onClick={closeShareModal}
+                      className="text-sm text-muted-foreground hover:underline"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </>
@@ -272,7 +342,6 @@ export function ShoppingListPanel() {
                   <>
                     <button
                       onClick={handleShare}
-                      disabled={sharing}
                       aria-label="Share list"
                       data-testid="share-list-btn"
                       className="flex items-center gap-2 rounded-xl px-4 py-3 text-base font-medium text-muted-foreground active:bg-muted transition-colors disabled:opacity-50"
