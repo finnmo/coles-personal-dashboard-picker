@@ -1,4 +1,4 @@
-# 0.1.0 (2026-04-25)
+# 0.1.0 (2026-04-26)
 
 
 ### Bug Fixes
@@ -29,6 +29,7 @@
 * **dashboard:** letter filter, name search, and RapidAPI result cache ([db98c63](https://github.com/finnmo/coles-personal-dashboard-picker/commit/db98c63f732f7be9b320eeb49f3b4d98ffb7fb99))
 * **dashboard:** touchscreen-optimised layout with Inter font and sidebar filter ([705d06d](https://github.com/finnmo/coles-personal-dashboard-picker/commit/705d06d9d54f74bc557ca8239fd2aa7cd3975b84))
 * **docker:** add prisma CLI copy to runner stage ([0fbfc99](https://github.com/finnmo/coles-personal-dashboard-picker/commit/0fbfc9903343ba9d1ed888598f75108aa957aa20))
+* **images:** fetch Coles image on product add, switch OFF to search service ([c763827](https://github.com/finnmo/coles-personal-dashboard-picker/commit/c76382738e36f2511e18937199b40ae1884194b0))
 * initial project scaffolding (feat/project-setup) ([46a602b](https://github.com/finnmo/coles-personal-dashboard-picker/commit/46a602b26b34ad32de23b61d3dd97d1037cd6ae0))
 * **list:** apple Reminders integration via iOS Shortcuts URL scheme ([d0552f0](https://github.com/finnmo/coles-personal-dashboard-picker/commit/d0552f071da929f2978ffbe8931df81eecddaca5))
 * **list:** google Tasks integration with OAuth2 and google_keep fallback ([07a7d0a](https://github.com/finnmo/coles-personal-dashboard-picker/commit/07a7d0ab076f5f6defe616448f0fd06a89402a6e))
@@ -36,6 +37,8 @@
 * **purchase:** priority tracking, purchase endpoint wiring, badge updates ([1a3bbe3](https://github.com/finnmo/coles-personal-dashboard-picker/commit/1a3bbe345bbb8eda2453663028cdf67bbc1218ed))
 * replace Coles/IGA store APIs with Open Food Facts ([77c4ef8](https://github.com/finnmo/coles-personal-dashboard-picker/commit/77c4ef8c641f4c8edb770cad2bb256128566dd4e))
 * round-2 improvements — shopping list, Unraid deploy, observability, resilience ([a3a2d0c](https://github.com/finnmo/coles-personal-dashboard-picker/commit/a3a2d0c06a1b375491b3ff86ea1d62ba5a2e771f))
+* **search:** add RapidAPI circuit breaker to protect free tier limit ([1dd2104](https://github.com/finnmo/coles-personal-dashboard-picker/commit/1dd2104d350bbcd77e58dbb3fa7b8729b8dc60a7))
+* **search:** replace Open Food Facts with unified Coles/Woolworths/IGA search ([97e87cc](https://github.com/finnmo/coles-personal-dashboard-picker/commit/97e87ccdced0d9f35af2beaed8ac7bc63a5ca426))
 
 
 ### Performance Improvements
