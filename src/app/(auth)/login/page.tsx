@@ -1,40 +1,36 @@
 'use client'
 
-import { useState, type FormEvent } from 'react'
+import { useState, useEffect, type FormEvent } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
+const ERROR_MESSAGES: Record<string, string> = {
+  invalid: 'Incorrect password — please try again',
+  too_many_attempts: 'Too many attempts — wait 15 minutes and try again',
+  server: 'Server error — contact the administrator',
+  invalid_request: 'Invalid request — please try again',
+}
+
 export default function LoginPage() {
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [urlError, setUrlError] = useState('')
 
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault()
-    setError('')
+  // Read any error code set by the server-side redirect on failed login.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const code = params.get('error')
+    if (code) setUrlError(ERROR_MESSAGES[code] ?? 'Login failed — please try again')
+  }, [])
+
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    // Do not preventDefault — the native form POST must go through so the
+    // browser receives the session cookie in a navigation response.
+    // iOS Safari only persists cookies from navigation responses, not fetch().
     setLoading(true)
-
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
-      })
-
-      if (res.ok) {
-        // Hard redirect — guarantees the session cookie is included in the next
-        // request and works correctly on older Safari (e.g. iOS 12) where
-        // Next.js soft navigation can silently fail after setting a cookie.
-        window.location.replace('/dashboard')
-      } else {
-        const data = await res.json()
-        setError(data.error ?? 'Login failed')
-      }
-    } catch {
-      setError('Network error — please try again')
-    } finally {
-      setLoading(false)
-    }
+    // If the form submission errors at the network level, the browser will
+    // display its own error. Clear loading state just in case JS is still alive.
+    setTimeout(() => setLoading(false), 10_000)
+    void e // suppress unused-variable lint
   }
 
   return (
@@ -45,13 +41,23 @@ export default function LoginPage() {
           <p className="mt-1 text-sm text-muted-foreground">Enter your password to continue</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {/*
+          Native form POST → /api/auth/login-redirect
+          The server validates, sets the session cookie in the 303 redirect
+          response, and redirects to /dashboard. This guarantees the cookie
+          lands in the browser's persistent store on all Safari versions.
+        */}
+        <form
+          method="POST"
+          action="/api/auth/login-redirect"
+          onSubmit={handleSubmit}
+          className="space-y-4"
+        >
           <Input
             type="password"
+            name="password"
             placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            error={error}
+            error={urlError}
             autoFocus
             autoComplete="current-password"
             aria-label="Password"

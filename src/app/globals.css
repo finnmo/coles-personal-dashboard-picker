@@ -2,6 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   iOS 12 / Safari < 14.1 compatibility patches
+   (CSS is not covered by browsersListForSwc which only affects JS)
+   ============================================================ */
+
+/* The CSS 'inset' shorthand is not supported until Safari 14.1.
+   Tailwind generates 'inset: 0px' for .inset-0 which is silently
+   ignored; provide explicit top/right/bottom/left fallbacks. */
+.inset-0 {
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+}
+
+/* 100vh on iOS Safari includes the browser chrome (address bar).
+   Use -webkit-fill-available so the dashboard shell fills the
+   actual visible viewport. Modern browsers ignore the -webkit- value. */
+.h-screen {
+  height: 100vh;
+  height: -webkit-fill-available;
+}
+
 @layer base {
   :root {
     --font-sans: 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;

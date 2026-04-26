@@ -38,7 +38,7 @@ export function SearchResultCard({ result, alreadyAdded, onAdd }: SearchResultCa
 
   return (
     <div
-      className="flex items-center gap-3 rounded-lg border border-border bg-card p-3"
+      className="flex items-center space-x-3 rounded-lg border border-border bg-card p-3"
       data-testid={`search-result-${result.externalId}`}
     >
       <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded bg-muted">
@@ -57,7 +57,7 @@ export function SearchResultCard({ result, alreadyAdded, onAdd }: SearchResultCa
 
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium text-foreground">{result.name}</p>
-        <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
+        <div className="mt-0.5 flex items-center space-x-2 text-xs text-muted-foreground">
           <span
             className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${STORE_CLASS[result.store]}`}
           >

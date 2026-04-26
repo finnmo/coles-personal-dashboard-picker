@@ -29,11 +29,11 @@ export function SaveOptions({ itemNames }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col space-y-3">
       {canShare && (
         <button
           onClick={shareNative}
-          className="flex items-center gap-3 rounded-2xl bg-primary px-5 py-4 text-base font-semibold text-primary-foreground active:scale-95 transition-transform w-full"
+          className="flex items-center space-x-3 rounded-2xl bg-primary px-5 py-4 text-base font-semibold text-primary-foreground active:scale-95 transition-transform w-full"
         >
           <Share2 className="h-5 w-5 shrink-0" />
           <span className="text-left leading-tight">Save to Reminders, Notes or Messages</span>
@@ -42,7 +42,7 @@ export function SaveOptions({ itemNames }: Props) {
 
       <a
         href={`sms:?body=${encodedText}`}
-        className="flex items-center gap-3 rounded-2xl border border-border bg-card px-5 py-4 text-base font-medium text-foreground active:bg-muted transition-colors w-full"
+        className="flex items-center space-x-3 rounded-2xl border border-border bg-card px-5 py-4 text-base font-medium text-foreground active:bg-muted transition-colors w-full"
       >
         <MessageSquare className="h-5 w-5 shrink-0 text-muted-foreground" />
         Send as SMS
@@ -50,7 +50,7 @@ export function SaveOptions({ itemNames }: Props) {
 
       <a
         href={`mailto:?subject=Shopping+List&body=${encodedText}`}
-        className="flex items-center gap-3 rounded-2xl border border-border bg-card px-5 py-4 text-base font-medium text-foreground active:bg-muted transition-colors w-full"
+        className="flex items-center space-x-3 rounded-2xl border border-border bg-card px-5 py-4 text-base font-medium text-foreground active:bg-muted transition-colors w-full"
       >
         <Mail className="h-5 w-5 shrink-0 text-muted-foreground" />
         Send as Email
@@ -58,7 +58,7 @@ export function SaveOptions({ itemNames }: Props) {
 
       <button
         onClick={copyList}
-        className="flex items-center gap-3 rounded-2xl border border-border bg-card px-5 py-4 text-base font-medium text-foreground active:bg-muted transition-colors w-full"
+        className="flex items-center space-x-3 rounded-2xl border border-border bg-card px-5 py-4 text-base font-medium text-foreground active:bg-muted transition-colors w-full"
       >
         {copied ? (
           <Check className="h-5 w-5 shrink-0 text-green-500" />

@@ -88,7 +88,7 @@ function SwipeableItem({ item, onRemove }: SwipeableItemProps) {
       </div>
 
       <div
-        className="relative flex items-center gap-3 py-3 bg-card touch-pan-y"
+        className="relative flex items-center space-x-3 py-3 bg-card touch-pan-y"
         style={{
           transform: `translateX(${translateX}px)`,
           transition: startX.current === null ? 'transform 0.2s ease' : undefined,
@@ -215,7 +215,7 @@ export function ShoppingListPanel() {
           />
           <div className="fixed inset-0 z-[70] flex items-center justify-center p-6 pointer-events-none">
             <div
-              className="pointer-events-auto flex flex-col items-center gap-5 rounded-3xl bg-card p-8 shadow-2xl w-full max-w-sm"
+              className="pointer-events-auto flex flex-col items-center space-y-5 rounded-3xl bg-card p-8 shadow-2xl w-full max-w-sm"
               onClick={(e) => e.stopPropagation()}
             >
               {shareView === 'choose' && (
@@ -223,7 +223,7 @@ export function ShoppingListPanel() {
                   <h2 className="text-2xl font-bold text-foreground">Share List</h2>
                   <button
                     onClick={() => setShareView('text')}
-                    className="flex items-center gap-4 w-full rounded-2xl border border-border px-5 py-4 text-left active:bg-muted transition-colors"
+                    className="flex items-center space-x-4 w-full rounded-2xl border border-border px-5 py-4 text-left active:bg-muted transition-colors"
                   >
                     <AlignLeft className="h-6 w-6 shrink-0 text-primary" />
                     <div>
@@ -233,7 +233,7 @@ export function ShoppingListPanel() {
                   </button>
                   <button
                     onClick={openLinkQr}
-                    className="flex items-center gap-4 w-full rounded-2xl border border-border px-5 py-4 text-left active:bg-muted transition-colors"
+                    className="flex items-center space-x-4 w-full rounded-2xl border border-border px-5 py-4 text-left active:bg-muted transition-colors"
                   >
                     <Smartphone className="h-6 w-6 shrink-0 text-primary" />
                     <div>
@@ -262,9 +262,10 @@ export function ShoppingListPanel() {
                   <div className="flex w-full items-center justify-between">
                     <button
                       onClick={() => setShareView('choose')}
-                      className="flex items-center gap-1 text-sm text-muted-foreground hover:underline"
+                      className="flex items-center space-x-1 text-sm text-muted-foreground hover:underline"
                     >
-                      <ChevronLeft className="h-4 w-4" /> Back
+                      <ChevronLeft className="h-4 w-4" />
+                      <span>Back</span>
                     </button>
                     <button
                       onClick={closeShareModal}
@@ -292,9 +293,10 @@ export function ShoppingListPanel() {
                   <div className="flex w-full items-center justify-between">
                     <button
                       onClick={() => setShareView('choose')}
-                      className="flex items-center gap-1 text-sm text-muted-foreground hover:underline"
+                      className="flex items-center space-x-1 text-sm text-muted-foreground hover:underline"
                     >
-                      <ChevronLeft className="h-4 w-4" /> Back
+                      <ChevronLeft className="h-4 w-4" />
+                      <span>Back</span>
                     </button>
                     <button
                       onClick={closeShareModal}
@@ -337,14 +339,14 @@ export function ShoppingListPanel() {
                     : `${items.length} item${items.length !== 1 ? 's' : ''}`}
                 </p>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center space-x-2">
                 {items.length > 0 && (
                   <>
                     <button
                       onClick={handleShare}
                       aria-label="Share list"
                       data-testid="share-list-btn"
-                      className="flex items-center gap-2 rounded-xl px-4 py-3 text-base font-medium text-muted-foreground active:bg-muted transition-colors disabled:opacity-50"
+                      className="flex items-center space-x-2 rounded-xl px-4 py-3 text-base font-medium text-muted-foreground active:bg-muted transition-colors disabled:opacity-50"
                     >
                       <Share2 className="h-5 w-5" />
                       Share
@@ -352,7 +354,7 @@ export function ShoppingListPanel() {
                     <button
                       onClick={clearAll}
                       data-testid="clear-list-btn"
-                      className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground active:bg-muted transition-colors"
+                      className="flex items-center space-x-1.5 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground active:bg-muted transition-colors"
                     >
                       <Trash2 className="h-4 w-4" />
                       Clear all
@@ -371,7 +373,7 @@ export function ShoppingListPanel() {
 
             <div className="overflow-y-auto px-4 pb-8">
               {items.length === 0 ? (
-                <div className="flex flex-col items-center gap-3 py-12 text-muted-foreground">
+                <div className="flex flex-col items-center space-y-3 py-12 text-muted-foreground">
                   <ShoppingCart className="h-10 w-10 opacity-30" />
                   <p className="text-base">Tap a product to add it</p>
                   <p className="text-sm opacity-70">Swipe left to remove items</p>

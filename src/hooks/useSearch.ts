@@ -27,14 +27,6 @@ export function useSearch() {
     debounceRef.current = setTimeout(async () => {
       try {
         const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`)
-        if (res.status === 401 || res.redirected) {
-          setState({
-            results: [],
-            isLoading: false,
-            error: 'Session expired — please log in again',
-          })
-          return
-        }
         const data = await res.json()
         if (!res.ok) {
           setState({ results: [], isLoading: false, error: data.error ?? 'Search failed' })
@@ -42,11 +34,7 @@ export function useSearch() {
           setState({ results: data.results ?? [], isLoading: false, error: null })
         }
       } catch {
-        setState({
-          results: [],
-          isLoading: false,
-          error: 'Search unavailable — check your connection',
-        })
+        setState({ results: [], isLoading: false, error: 'Search unavailable' })
       }
     }, 400)
 

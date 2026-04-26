@@ -17,7 +17,7 @@ type Tab = 'search' | 'manage'
 export function AddProductDialog({ open, onClose }: AddProductDialogProps) {
   const [activeTab, setActiveTab] = useState<Tab>('search')
   const [closing, setClosing] = useState(false)
-  const [maxHeight, setMaxHeight] = useState<string>('85dvh')
+  const [maxHeight, setMaxHeight] = useState<string>('85vh')
   const { products, mutate } = useProducts()
   const dialogRef = useRef<HTMLDivElement>(null)
 
@@ -126,7 +126,7 @@ export function AddProductDialog({ open, onClose }: AddProductDialogProps) {
 
           {/* Tab controls */}
           <div className="flex flex-shrink-0 px-5 pb-3">
-            <div className="flex rounded-xl bg-muted p-1 gap-1">
+            <div className="flex rounded-xl bg-muted p-1 space-x-1">
               <button
                 onClick={() => setActiveTab('search')}
                 className={`rounded-lg px-4 py-1.5 text-sm font-semibold transition-colors ${
@@ -139,7 +139,7 @@ export function AddProductDialog({ open, onClose }: AddProductDialogProps) {
               </button>
               <button
                 onClick={() => setActiveTab('manage')}
-                className={`flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-sm font-semibold transition-colors ${
+                className={`flex items-center space-x-1.5 rounded-lg px-4 py-1.5 text-sm font-semibold transition-colors ${
                   activeTab === 'manage'
                     ? 'bg-card text-foreground shadow-sm'
                     : 'text-muted-foreground active:text-foreground'

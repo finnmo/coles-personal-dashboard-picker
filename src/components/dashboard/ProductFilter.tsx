@@ -56,7 +56,7 @@ export function ProductFilter({ products, children }: ProductFilterProps) {
   return (
     <div className="flex min-h-0 flex-1">
       {/* Left letter sidebar */}
-      <div className="flex w-12 flex-col items-center gap-0.5 overflow-y-auto border-r border-border bg-card py-2">
+      <div className="flex w-12 flex-col items-center space-y-0.5 overflow-y-auto border-r border-border bg-card py-2">
         {LETTERS.map((letter) => {
           const available = availableLetters.has(letter)
           const active = activeLetter === letter

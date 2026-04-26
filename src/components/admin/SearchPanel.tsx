@@ -14,7 +14,7 @@ export function SearchPanel({ onAdd, existingIds }: SearchPanelProps) {
   const { query, setQuery, results, isLoading, error } = useSearch()
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col space-y-3">
       <div className="relative">
         <Search className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
         <input
@@ -40,7 +40,7 @@ export function SearchPanel({ onAdd, existingIds }: SearchPanelProps) {
       {error && <p className="text-sm text-red-500">{error}</p>}
 
       {results.length > 0 && (
-        <div className="flex flex-col gap-2" data-testid="search-results">
+        <div className="flex flex-col space-y-2" data-testid="search-results">
           {results.map((result) => (
             <SearchResultCard
               key={result.externalId}
