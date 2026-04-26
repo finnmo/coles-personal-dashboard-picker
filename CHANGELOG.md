@@ -38,6 +38,7 @@
 * **list:** google Tasks integration with OAuth2 and google_keep fallback ([07a7d0a](https://github.com/finnmo/coles-personal-dashboard-picker/commit/07a7d0ab076f5f6defe616448f0fd06a89402a6e))
 * password authentication with JWT session cookies ([76639b7](https://github.com/finnmo/coles-personal-dashboard-picker/commit/76639b780ef4da1a5a0bad392f8af69d8f0d545c))
 * **purchase:** priority tracking, purchase endpoint wiring, badge updates ([1a3bbe3](https://github.com/finnmo/coles-personal-dashboard-picker/commit/1a3bbe345bbb8eda2453663028cdf67bbc1218ed))
+* remove authentication — app is local-network only ([6232344](https://github.com/finnmo/coles-personal-dashboard-picker/commit/6232344fd504ca01f741bf2babb4a11906057c8f))
 * replace Coles/IGA store APIs with Open Food Facts ([77c4ef8](https://github.com/finnmo/coles-personal-dashboard-picker/commit/77c4ef8c641f4c8edb770cad2bb256128566dd4e))
 * round-2 improvements — shopping list, Unraid deploy, observability, resilience ([a3a2d0c](https://github.com/finnmo/coles-personal-dashboard-picker/commit/a3a2d0c06a1b375491b3ff86ea1d62ba5a2e771f))
 * **search:** add RapidAPI circuit breaker to protect free tier limit ([1dd2104](https://github.com/finnmo/coles-personal-dashboard-picker/commit/1dd2104d350bbcd77e58dbb3fa7b8729b8dc60a7))
