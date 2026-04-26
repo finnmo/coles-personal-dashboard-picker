@@ -9,6 +9,7 @@
 * **ci:** resolve npm ci failures and Google Fonts build error ([3bea956](https://github.com/finnmo/coles-personal-dashboard-picker/commit/3bea95610e9acbe357b7a32a253cad0614b0442f))
 * **ci:** sync lock file, fix formatting, fix soft-delete integration test ([22adc98](https://github.com/finnmo/coles-personal-dashboard-picker/commit/22adc983fbcec6f2d162d8153d84d3144eeaa526))
 * **coles-api:** construct CDN image URL directly instead of scraping ([1f4aafa](https://github.com/finnmo/coles-personal-dashboard-picker/commit/1f4aafa5abc653cf86bb8093a587b1735237b1da))
+* **compat:** iOS 12 Safari login, layout, and CSS compatibility ([ca460a2](https://github.com/finnmo/coles-personal-dashboard-picker/commit/ca460a21cac776e37e2807360e51e2811b305f29))
 * **compat:** resolve login redirect and search failures on iOS 12 Safari ([9f624d9](https://github.com/finnmo/coles-personal-dashboard-picker/commit/9f624d9431ec17a2c85bc94c80318145c8add8c7))
 * **deps:** replace deprecated conventional-changelog-cli with conventional-changelog@7 ([e24dffc](https://github.com/finnmo/coles-personal-dashboard-picker/commit/e24dffc4c04b19941b9ae8ac0363bcd32d677da8))
 * **docker:** copy bcryptjs explicitly into runner stage for entrypoint ([7b331df](https://github.com/finnmo/coles-personal-dashboard-picker/commit/7b331dfe5a92bde44085bdfc567507c1952f6f17))
