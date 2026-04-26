@@ -15,15 +15,14 @@ export function validateEnv(): ValidationResult {
     errors.push('DATABASE_URL is required')
   }
 
-  // List provider
+  // List provider — optional; if omitted the shopping list still works locally
+  // but won't sync to Google Tasks or Apple Reminders.
   const provider = env.LIST_PROVIDER
-  if (!provider) {
-    errors.push(`LIST_PROVIDER is required. Valid values: ${VALID_LIST_PROVIDERS.join(', ')}`)
-  } else if (!isValidProvider(provider)) {
+  if (provider && !isValidProvider(provider)) {
     errors.push(
       `LIST_PROVIDER "${provider}" is invalid. Valid values: ${VALID_LIST_PROVIDERS.join(', ')}`
     )
-  } else {
+  } else if (provider) {
     if (provider === 'apple_reminders') {
       if (!env.APPLE_SHORTCUTS_NAME) {
         errors.push('APPLE_SHORTCUTS_NAME is required when LIST_PROVIDER=apple_reminders')

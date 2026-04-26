@@ -2,8 +2,17 @@ import type { ListProvider } from './types'
 import { AppleRemindersProvider } from './apple-reminders'
 import { GoogleTasksProvider } from './google-tasks'
 
+/**
+ * Returns the configured list provider, or throws if the configuration is
+ * invalid. Returns null (not throws) when LIST_PROVIDER is simply not set —
+ * callers treat that as "no external sync, use local cache only".
+ */
 export function getListProvider(): ListProvider {
   const provider = process.env.LIST_PROVIDER
+
+  if (!provider) {
+    throw new Error('LIST_PROVIDER is not configured')
+  }
 
   if (provider === 'apple_reminders') {
     const shortcutName = process.env.APPLE_SHORTCUTS_NAME

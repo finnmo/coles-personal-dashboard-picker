@@ -26,10 +26,11 @@ model Product {
 }
 
 model ShoppingListItem {
-  id        String   @id @default(cuid())
-  productId String   @unique
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  addedAt   DateTime @default(now())
+  id           String   @id @default(cuid())
+  productId    String   @unique
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  googleTaskId String?  // null when list provider is not Google Tasks
+  addedAt      DateTime @default(now())
 }
 
 model PurchaseEvent {

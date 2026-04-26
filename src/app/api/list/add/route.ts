@@ -36,14 +36,20 @@ export async function POST(request: Request) {
     return apiError(message, 'SERVER_ERROR', 503)
   }
 
-  const [result] = await Promise.all([
-    provider.add({ productName: product.name }),
-    db.shoppingListItem.upsert({
-      where: { productId },
-      update: { addedAt: new Date() },
-      create: { productId },
-    }),
-  ])
+  const result = await provider.add({ productName: product.name })
+
+  // Store in local SQLite as a display cache (preserves imageUrl and product details)
+  await db.shoppingListItem.upsert({
+    where: { productId },
+    update: {
+      addedAt: new Date(),
+      googleTaskId: result.taskId ?? null,
+    },
+    create: {
+      productId,
+      googleTaskId: result.taskId ?? null,
+    },
+  })
 
   return apiOk(result)
 }

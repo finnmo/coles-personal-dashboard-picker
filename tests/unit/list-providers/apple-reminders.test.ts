@@ -52,4 +52,16 @@ describe('AppleRemindersProvider', () => {
     expect(url.searchParams.has('name')).toBe(true)
     expect(url.searchParams.has('input')).toBe(true)
   })
+
+  it('list() returns an empty array (write-only provider)', async () => {
+    expect(await provider.list()).toEqual([])
+  })
+
+  it('complete() resolves without error', async () => {
+    await expect(provider.complete('any-id')).resolves.toBeUndefined()
+  })
+
+  it('clear() resolves without error', async () => {
+    await expect(provider.clear()).resolves.toBeUndefined()
+  })
 })
