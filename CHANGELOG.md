@@ -33,6 +33,7 @@
 * **dashboard:** letter filter, name search, and RapidAPI result cache ([db98c63](https://github.com/finnmo/coles-personal-dashboard-picker/commit/db98c63f732f7be9b320eeb49f3b4d98ffb7fb99))
 * **dashboard:** touchscreen-optimised layout with Inter font and sidebar filter ([705d06d](https://github.com/finnmo/coles-personal-dashboard-picker/commit/705d06d9d54f74bc557ca8239fd2aa7cd3975b84))
 * **docker:** add prisma CLI copy to runner stage ([0fbfc99](https://github.com/finnmo/coles-personal-dashboard-picker/commit/0fbfc9903343ba9d1ed888598f75108aa957aa20))
+* google tasks sync and always-visible shopping list sidebar ([305ca7c](https://github.com/finnmo/coles-personal-dashboard-picker/commit/305ca7c518c0ab0bd359e4e883df28831697b1c3))
 * **images:** fetch Coles image on product add, switch OFF to search service ([c763827](https://github.com/finnmo/coles-personal-dashboard-picker/commit/c76382738e36f2511e18937199b40ae1884194b0))
 * initial project scaffolding (feat/project-setup) ([46a602b](https://github.com/finnmo/coles-personal-dashboard-picker/commit/46a602b26b34ad32de23b61d3dd97d1037cd6ae0))
 * **list:** apple Reminders integration via iOS Shortcuts URL scheme ([d0552f0](https://github.com/finnmo/coles-personal-dashboard-picker/commit/d0552f071da929f2978ffbe8931df81eecddaca5))
