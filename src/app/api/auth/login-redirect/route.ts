@@ -8,8 +8,20 @@ function getIp(request: Request): string {
   return request.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? 'unknown'
 }
 
-function loginUrl(request: Request): URL {
-  return new URL('/login', request.url)
+/**
+ * Build an absolute URL using the Host request header so that redirects
+ * work correctly when the app is running inside Docker. Inside Docker,
+ * request.url contains the server's bind address (0.0.0.0) rather than
+ * the address the client actually used, so we must use the Host header.
+ */
+function clientUrl(request: Request, path: string): string {
+  const host = request.headers.get('x-forwarded-host') ?? request.headers.get('host')
+  const proto = request.headers.get('x-forwarded-proto') ?? 'http'
+  return host ? `${proto}://${host}${path}` : new URL(path, request.url).toString()
+}
+
+function loginUrl(request: Request, error: string): string {
+  return clientUrl(request, `/login?error=${encodeURIComponent(error)}`)
 }
 
 /**
@@ -22,9 +34,7 @@ export async function POST(request: Request) {
   const ip = getIp(request)
   const limit = loginLimiter.check(ip)
   if (!limit.allowed) {
-    const url = loginUrl(request)
-    url.searchParams.set('error', 'too_many_attempts')
-    return NextResponse.redirect(url, { status: 303 })
+    return NextResponse.redirect(loginUrl(request, 'too_many_attempts'), { status: 303 })
   }
 
   let password: string | null = null
@@ -32,29 +42,21 @@ export async function POST(request: Request) {
     const form = await request.formData()
     password = form.get('password') as string | null
   } catch {
-    const url = loginUrl(request)
-    url.searchParams.set('error', 'invalid_request')
-    return NextResponse.redirect(url, { status: 303 })
+    return NextResponse.redirect(loginUrl(request, 'invalid_request'), { status: 303 })
   }
 
   if (!password) {
-    const url = loginUrl(request)
-    url.searchParams.set('error', 'invalid')
-    return NextResponse.redirect(url, { status: 303 })
+    return NextResponse.redirect(loginUrl(request, 'invalid'), { status: 303 })
   }
 
   const hash = process.env.APP_PASSWORD_HASH
   if (!hash) {
-    const url = loginUrl(request)
-    url.searchParams.set('error', 'server')
-    return NextResponse.redirect(url, { status: 303 })
+    return NextResponse.redirect(loginUrl(request, 'server'), { status: 303 })
   }
 
   const valid = await verifyPassword(password, hash)
   if (!valid) {
-    const url = loginUrl(request)
-    url.searchParams.set('error', 'invalid')
-    return NextResponse.redirect(url, { status: 303 })
+    return NextResponse.redirect(loginUrl(request, 'invalid'), { status: 303 })
   }
 
   const token = await createSessionToken()
@@ -63,7 +65,7 @@ export async function POST(request: Request) {
 
   // 303 See Other — browser follows with a GET, cookie is set on this navigation
   // response and stored in the persistent cookie jar.
-  const response = NextResponse.redirect(new URL('/dashboard', request.url), { status: 303 })
+  const response = NextResponse.redirect(clientUrl(request, '/dashboard'), { status: 303 })
   response.cookies.set('session', token, {
     httpOnly: true,
     secure: secureCookie,
