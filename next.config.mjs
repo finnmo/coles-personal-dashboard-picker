@@ -3,6 +3,7 @@ const nextConfig = {
   output: 'standalone',
   experimental: {
     instrumentationHook: true,
+    browsersListForSwc: true,
   },
   images: {
     remotePatterns: [

@@ -1,12 +1,10 @@
 'use client'
 
 import { useState, type FormEvent } from 'react'
-import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
 export default function LoginPage() {
-  const router = useRouter()
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -24,8 +22,10 @@ export default function LoginPage() {
       })
 
       if (res.ok) {
-        router.push('/dashboard')
-        router.refresh()
+        // Hard redirect — guarantees the session cookie is included in the next
+        // request and works correctly on older Safari (e.g. iOS 12) where
+        // Next.js soft navigation can silently fail after setting a cookie.
+        window.location.replace('/dashboard')
       } else {
         const data = await res.json()
         setError(data.error ?? 'Login failed')
