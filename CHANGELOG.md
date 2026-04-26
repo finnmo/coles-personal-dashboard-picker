@@ -39,6 +39,7 @@
 * round-2 improvements — shopping list, Unraid deploy, observability, resilience ([a3a2d0c](https://github.com/finnmo/coles-personal-dashboard-picker/commit/a3a2d0c06a1b375491b3ff86ea1d62ba5a2e771f))
 * **search:** add RapidAPI circuit breaker to protect free tier limit ([1dd2104](https://github.com/finnmo/coles-personal-dashboard-picker/commit/1dd2104d350bbcd77e58dbb3fa7b8729b8dc60a7))
 * **search:** replace Open Food Facts with unified Coles/Woolworths/IGA search ([97e87cc](https://github.com/finnmo/coles-personal-dashboard-picker/commit/97e87ccdced0d9f35af2beaed8ac7bc63a5ca426))
+* **sharing:** add dual-mode QR sharing and mobile save page ([a703b36](https://github.com/finnmo/coles-personal-dashboard-picker/commit/a703b36eacfea6981842e38b393f296ee93a60e4))
 
 
 ### Performance Improvements
