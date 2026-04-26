@@ -20,6 +20,7 @@
 * **docker:** resolve SQLite path mismatch and volume write permissions ([ecbdfbd](https://github.com/finnmo/coles-personal-dashboard-picker/commit/ecbdfbdf50c169fd2496c8e12d4efd640e613469))
 * **prisma:** add linux-musl openssl-3.0.x binary targets for Alpine ([e5e61c4](https://github.com/finnmo/coles-personal-dashboard-picker/commit/e5e61c449596c11e1a7cf87e84123f4b87ddd8ec))
 * **release:** switch to TriPSs/conventional-changelog-action to avoid broken CLI ([1598ee8](https://github.com/finnmo/coles-personal-dashboard-picker/commit/1598ee816c040e3cb6050534ba2444dd5e2aa752))
+* use Host header for login redirects to avoid Docker 0.0.0.0 address ([4df3191](https://github.com/finnmo/coles-personal-dashboard-picker/commit/4df31911f90a71e78c8b7765731fef968da6117e))
 
 
 ### Features
