@@ -1,6 +1,6 @@
 import { test, expect, seedProduct } from './fixtures/auth'
 
-test.describe('Shopping List Panel', () => {
+test.describe('Shopping List Sidebar', () => {
   let cleanup: () => Promise<void>
 
   test.beforeEach(async ({ page }) => {
@@ -11,30 +11,25 @@ test.describe('Shopping List Panel', () => {
 
   test.afterEach(async ({ page }) => {
     await cleanup().catch(() => {})
-    // Clear shopping list state
     await page.request.delete('/api/shopping-list').catch(() => {})
   })
 
-  test('tapping a product adds it to the shopping list panel', async ({ page }) => {
+  test('shopping list sidebar is always visible', async ({ page }) => {
+    await expect(page.getByTestId('shopping-list-panel')).toBeVisible()
+  })
+
+  test('tapping a product adds it to the shopping list sidebar', async ({ page }) => {
     const tile = page.locator('[data-testid^="product-tile-"]').first()
     await tile.click()
-    await expect(page.getByTestId('shopping-list-panel')).toBeVisible()
     await expect(page.getByTestId('shopping-list-panel')).toContainText('E2E List Milk')
   })
 
-  test('badge count appears on shopping list FAB after adding', async ({ page }) => {
+  test('Clear all button empties the list', async ({ page }) => {
     const tile = page.locator('[data-testid^="product-tile-"]').first()
     await tile.click()
-    await expect(page.getByTestId('shopping-list-badge')).toBeVisible()
-  })
-
-  test('Clear all button empties the list and hides the badge', async ({ page }) => {
-    const tile = page.locator('[data-testid^="product-tile-"]').first()
-    await tile.click()
-    await expect(page.getByTestId('shopping-list-panel')).toBeVisible()
+    await expect(page.getByTestId('shopping-list-panel')).toContainText('E2E List Milk')
     await page.getByTestId('clear-list-btn').click()
-    await expect(page.getByTestId('shopping-list-panel')).not.toBeVisible()
-    await expect(page.getByTestId('shopping-list-badge')).not.toBeVisible()
+    await expect(page.getByTestId('shopping-list-panel')).not.toContainText('E2E List Milk')
   })
 
   test('/list/INVALID_TOKEN shows link expired', async ({ page }) => {
