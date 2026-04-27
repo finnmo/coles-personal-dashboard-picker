@@ -12,7 +12,7 @@ Runs in Docker on a home server. No login required (LAN-only). Light and dark mo
 
 **Product grid (70%)** — Products are sorted by a priority score (`days since last purchase ÷ repurchase interval`). Overdue items bubble to the top with a red "Overdue" badge. Items never bought sit at the bottom with a blue "New" badge. Tap any tile to record a purchase and add it to the shopping list.
 
-**Shopping list sidebar (30%)** — Always visible on the right. Shows everything currently in your Google Tasks list. Remove individual items or clear all at once. Polls Google Tasks every 30 seconds — items checked off on your phone disappear automatically.
+**Shopping list sidebar (30%)** — Always visible on the right. Shows everything currently in your Todoist project (or local cache if no provider is configured). Remove individual items or clear all at once. Polls every 30 seconds — items checked off on your phone disappear automatically.
 
 **Add products** — Tap "Add" in the header to search Coles, Woolworths, and IGA simultaneously. Results include store badge, price, and product image. Set a repurchase interval and the priority score handles the rest.
 
@@ -74,24 +74,39 @@ Migrations run automatically on container start.
 
 ## Environment variables
 
-| Variable               | Required           | Description                                                            |
-| ---------------------- | ------------------ | ---------------------------------------------------------------------- |
-| `DATABASE_URL`         | No                 | SQLite path — defaults to `file:/app/data/dashboard.db`                |
-| `LIST_PROVIDER`        | No                 | `google_tasks` · `apple_reminders` · leave blank for local-only        |
-| `GOOGLE_CLIENT_ID`     | If Google Tasks    | OAuth client ID                                                        |
-| `GOOGLE_CLIENT_SECRET` | If Google Tasks    | OAuth client secret                                                    |
-| `GOOGLE_REFRESH_TOKEN` | If Google Tasks    | Run `npx tsx scripts/google-oauth-setup.ts` to generate                |
-| `GOOGLE_TASK_LIST_ID`  | If Google Tasks    | Task list ID — script prints available lists                           |
-| `APPLE_SHORTCUTS_NAME` | If Apple Reminders | Name of your iOS Shortcut                                              |
-| `RAPIDAPI_KEY`         | No                 | Free-tier key for Coles + Woolworths search (IGA works without it)     |
-| `SHARE_HOST`           | No                 | LAN IP or hostname for QR share URLs — required when running in Docker |
-| `SHARE_SECRET`         | No                 | Secret for signing share tokens — random fallback used if unset        |
+| Variable               | Required           | Description                                                                 |
+| ---------------------- | ------------------ | --------------------------------------------------------------------------- |
+| `DATABASE_URL`         | No                 | SQLite path — defaults to `file:/app/data/dashboard.db`                     |
+| `LIST_PROVIDER`        | No                 | `todoist` · `google_tasks` · `apple_reminders` · leave blank for local-only |
+| `TODOIST_API_TOKEN`    | If Todoist         | Settings → Integrations → Developer → API token                             |
+| `TODOIST_PROJECT_ID`   | No                 | Shared project ID — leave blank for Inbox                                   |
+| `GOOGLE_CLIENT_ID`     | If Google Tasks    | OAuth client ID                                                             |
+| `GOOGLE_CLIENT_SECRET` | If Google Tasks    | OAuth client secret                                                         |
+| `GOOGLE_REFRESH_TOKEN` | If Google Tasks    | Run `npx tsx scripts/google-oauth-setup.ts` to generate                     |
+| `GOOGLE_TASK_LIST_ID`  | If Google Tasks    | Task list ID — script prints available lists                                |
+| `APPLE_SHORTCUTS_NAME` | If Apple Reminders | Name of your iOS Shortcut                                                   |
+| `RAPIDAPI_KEY`         | No                 | Free-tier key for Coles + Woolworths search (IGA works without it)          |
+| `SHARE_HOST`           | No                 | LAN IP or hostname for QR share URLs — required when running in Docker      |
+| `SHARE_SECRET`         | No                 | Secret for signing share tokens — random fallback used if unset             |
 
 See `.env.example` for full descriptions and setup instructions.
 
 ---
 
-## Google Tasks setup
+## Todoist setup (recommended)
+
+1. Sign up at [todoist.com](https://todoist.com) (free)
+2. Create a project called **Shopping** and share it with household members
+3. Go to **Settings → Integrations → Developer** and copy your **API token**
+4. Find your project ID in the URL: `todoist.com/app/project/`**`<ID>`**
+5. Add to `.env`:
+   ```
+   LIST_PROVIDER=todoist
+   TODOIST_API_TOKEN=<your token>
+   TODOIST_PROJECT_ID=<your project id>
+   ```
+
+## Google Tasks setup (alternative — personal only, cannot share lists)
 
 Run the helper script once to get your OAuth refresh token and task list ID:
 
@@ -113,7 +128,7 @@ Full step-by-step: [docs/GOOGLE_TASKS_SETUP.md](docs/GOOGLE_TASKS_SETUP.md)
 | Styling        | Tailwind CSS, next-themes                                         |
 | Data fetching  | SWR (30s polling for shopping list sync)                          |
 | Product search | Coles + Woolworths (RapidAPI) · IGA (scrape) with circuit breaker |
-| List sync      | Google Tasks API (OAuth2 refresh token)                           |
+| List sync      | Todoist REST API · Google Tasks API · Apple Reminders (Shortcuts) |
 | Deploy         | Docker — image published to ghcr.io via GitHub Actions            |
 
 ---

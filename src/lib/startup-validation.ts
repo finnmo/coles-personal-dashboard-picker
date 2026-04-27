@@ -1,6 +1,6 @@
 type ValidationResult = { valid: true } | { valid: false; errors: string[] }
 
-const VALID_LIST_PROVIDERS = ['apple_reminders', 'google_tasks', 'google_keep'] as const
+const VALID_LIST_PROVIDERS = ['apple_reminders', 'todoist', 'google_tasks', 'google_keep'] as const
 type ListProvider = (typeof VALID_LIST_PROVIDERS)[number]
 
 function isValidProvider(value: string): value is ListProvider {
@@ -16,7 +16,7 @@ export function validateEnv(): ValidationResult {
   }
 
   // List provider — optional; if omitted the shopping list still works locally
-  // but won't sync to Google Tasks or Apple Reminders.
+  // but won't sync to any external service.
   const provider = env.LIST_PROVIDER
   if (provider && !isValidProvider(provider)) {
     errors.push(
@@ -26,6 +26,12 @@ export function validateEnv(): ValidationResult {
     if (provider === 'apple_reminders') {
       if (!env.APPLE_SHORTCUTS_NAME) {
         errors.push('APPLE_SHORTCUTS_NAME is required when LIST_PROVIDER=apple_reminders')
+      }
+    }
+
+    if (provider === 'todoist') {
+      if (!env.TODOIST_API_TOKEN) {
+        errors.push('TODOIST_API_TOKEN is required when LIST_PROVIDER=todoist')
       }
     }
 

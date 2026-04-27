@@ -1,11 +1,12 @@
 import type { ListProvider } from './types'
 import { AppleRemindersProvider } from './apple-reminders'
 import { GoogleTasksProvider } from './google-tasks'
+import { TodoistProvider } from './todoist'
 
 /**
  * Returns the configured list provider, or throws if the configuration is
- * invalid. Returns null (not throws) when LIST_PROVIDER is simply not set —
- * callers treat that as "no external sync, use local cache only".
+ * invalid. Throws when LIST_PROVIDER is simply not set — callers treat that
+ * as "no external sync, use local cache only".
  */
 export function getListProvider(): ListProvider {
   const provider = process.env.LIST_PROVIDER
@@ -20,6 +21,14 @@ export function getListProvider(): ListProvider {
       throw new Error('APPLE_SHORTCUTS_NAME is required when LIST_PROVIDER=apple_reminders')
     }
     return new AppleRemindersProvider(shortcutName)
+  }
+
+  if (provider === 'todoist') {
+    const apiToken = process.env.TODOIST_API_TOKEN
+    if (!apiToken) {
+      throw new Error('TODOIST_API_TOKEN is required when LIST_PROVIDER=todoist')
+    }
+    return new TodoistProvider(apiToken, process.env.TODOIST_PROJECT_ID)
   }
 
   if (provider === 'google_tasks' || provider === 'google_keep') {
@@ -46,10 +55,11 @@ export function getListProvider(): ListProvider {
   }
 
   throw new Error(
-    `LIST_PROVIDER "${provider}" is not supported. Valid values: apple_reminders, google_tasks, google_keep`
+    `LIST_PROVIDER "${provider}" is not supported. Valid values: todoist, google_tasks, apple_reminders`
   )
 }
 
 export { AppleRemindersProvider } from './apple-reminders'
 export { GoogleTasksProvider } from './google-tasks'
+export { TodoistProvider } from './todoist'
 export type { ListProvider, AddItemRequest, AddItemResponse } from './types'
