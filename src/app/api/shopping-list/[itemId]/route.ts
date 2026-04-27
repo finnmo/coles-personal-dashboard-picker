@@ -7,14 +7,14 @@ export async function DELETE(_req: Request, { params }: { params: { itemId: stri
   const item = await db.shoppingListItem.findUnique({ where: { id: params.itemId } })
   if (!item) return apiError('Item not found', 'NOT_FOUND', 404)
 
-  // Mark the corresponding Google Task as complete (if we have the ID)
+  // Mark the corresponding task as complete in the list provider (if we have the ID)
   if (item.googleTaskId) {
     try {
       const provider = getListProvider()
       await provider.complete(item.googleTaskId)
     } catch (err) {
       // Log but don't fail — we still remove it from local cache
-      logger.warn({ err, itemId: params.itemId }, 'Could not complete Google Task')
+      logger.warn({ err, itemId: params.itemId }, 'Could not complete task in list provider')
     }
   }
 

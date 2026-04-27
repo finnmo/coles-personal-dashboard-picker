@@ -6,12 +6,11 @@ import logger from '@/lib/logger'
 /**
  * GET /api/shopping-list
  *
- * For Google Tasks: fetches the live task list and syncs the local SQLite
- * cache so the sidebar can display product images (which Google Tasks
- * doesn't store). Items checked off in the Google Tasks app are purged
- * from the local cache here.
+ * For bidirectional providers (todoist, google_tasks): fetches the live task
+ * list and syncs the local SQLite cache so the sidebar can display product
+ * images. Items checked off on mobile are purged from the local cache here.
  *
- * For Apple Reminders (write-only): returns the local cache as-is.
+ * For write-only providers (apple_reminders): returns the local cache as-is.
  */
 export async function GET() {
   let provider
@@ -23,25 +22,27 @@ export async function GET() {
     return apiOk({ items, synced: false })
   }
 
-  if (provider.name !== 'google_tasks') {
-    // Apple Reminders is write-only; serve local cache.
+  const isBidirectional = provider.name === 'todoist' || provider.name === 'google_tasks'
+
+  if (!isBidirectional) {
+    // Write-only providers (apple_reminders) — serve local cache.
     const items = await localItems()
     return apiOk({ items, synced: false })
   }
 
-  // --- Google Tasks: sync local cache with live tasks ---
+  // --- Bidirectional sync: fetch live tasks and reconcile local cache ---
   let liveTasks: { taskId: string; title: string }[]
   try {
     liveTasks = await provider.list()
   } catch (err) {
-    logger.warn({ err }, 'Failed to fetch Google Tasks — serving local cache')
+    logger.warn({ err }, `Failed to fetch ${provider.name} tasks — serving local cache`)
     const items = await localItems()
-    return apiOk({ items, synced: false, error: 'google_tasks_unavailable' })
+    return apiOk({ items, synced: false, error: 'provider_unavailable' })
   }
 
   const liveTaskIds = new Set(liveTasks.map((t) => t.taskId))
 
-  // Remove local cache entries whose Google Task has been completed/deleted
+  // Remove local cache entries whose task has been completed/deleted externally
   await db.shoppingListItem.deleteMany({
     where: {
       googleTaskId: { not: null },
@@ -56,7 +57,7 @@ export async function GET() {
 /**
  * DELETE /api/shopping-list
  *
- * Clears all tasks in Google Tasks and wipes the local cache.
+ * Clears all tasks in the list provider and wipes the local cache.
  */
 export async function DELETE() {
   try {
