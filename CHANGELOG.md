@@ -28,6 +28,7 @@
 
 ### Features
 
+* add Todoist list provider alongside Google Tasks and Apple Reminders ([1b2cb9e](https://github.com/finnmo/coles-personal-dashboard-picker/commit/1b2cb9e09b1f1fcd5d9241136b044b06dc550371))
 * **admin:** admin panel, product CRUD, startup validation ([ef270fc](https://github.com/finnmo/coles-personal-dashboard-picker/commit/ef270fc7a6de5317179d7bfe5939728fc994545a))
 * **admin:** scrape og:image from Coles product page on add ([d4ce493](https://github.com/finnmo/coles-personal-dashboard-picker/commit/d4ce49346510433e1d72df66af07f27b8da49d80))
 * **coles-api:** switch to RapidAPI coles-product-price-api ([9c12568](https://github.com/finnmo/coles-personal-dashboard-picker/commit/9c12568567217e199f53125711036d6815d92121))
