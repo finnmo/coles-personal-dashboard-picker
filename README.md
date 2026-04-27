@@ -1,6 +1,8 @@
 # Household Dashboard
 
-![alt text](https://github.com/finnmo/coles-personal-dashboard-picker/images/dashboard.png "Dashboard Home Preview")
+![alt text](https://github.com/finnmo/coles-personal-dashboard-picker/blob/main/images/dashboard.png "Dashboard Home Preview")
+
+
 
 A wall-mounted iPad grocery dashboard. Shows your household grocery items sorted by how overdue they are for restocking. Tap a product to mark it as bought and add it to a shared shopping list.
 
