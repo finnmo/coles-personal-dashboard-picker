@@ -75,10 +75,12 @@ describe('TodoistProvider', () => {
   describe('list()', () => {
     it('returns incomplete tasks as ListItem array', async () => {
       mockFetch.mockReturnValueOnce(
-        jsonResponse([
-          { id: 'task-1', content: 'Milk', is_completed: false },
-          { id: 'task-2', content: 'Eggs', is_completed: false },
-        ])
+        jsonResponse({
+          results: [
+            { id: 'task-1', content: 'Milk', checked: false },
+            { id: 'task-2', content: 'Eggs', checked: false },
+          ],
+        })
       )
       const items = await makeProvider().list()
       expect(items).toHaveLength(2)
@@ -87,10 +89,12 @@ describe('TodoistProvider', () => {
 
     it('filters out completed tasks', async () => {
       mockFetch.mockReturnValueOnce(
-        jsonResponse([
-          { id: 'task-1', content: 'Milk', is_completed: true },
-          { id: 'task-2', content: 'Eggs', is_completed: false },
-        ])
+        jsonResponse({
+          results: [
+            { id: 'task-1', content: 'Milk', checked: true },
+            { id: 'task-2', content: 'Eggs', checked: false },
+          ],
+        })
       )
       const items = await makeProvider().list()
       expect(items).toHaveLength(1)
@@ -133,10 +137,12 @@ describe('TodoistProvider', () => {
     it('completes all listed tasks', async () => {
       mockFetch
         .mockReturnValueOnce(
-          jsonResponse([
-            { id: 'task-1', content: 'Milk', is_completed: false },
-            { id: 'task-2', content: 'Eggs', is_completed: false },
-          ])
+          jsonResponse({
+            results: [
+              { id: 'task-1', content: 'Milk', checked: false },
+              { id: 'task-2', content: 'Eggs', checked: false },
+            ],
+          })
         )
         .mockReturnValue(
           Promise.resolve({ ok: true, status: 204, text: () => Promise.resolve('') })

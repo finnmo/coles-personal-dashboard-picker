@@ -36,7 +36,13 @@ export async function POST(request: Request) {
     return apiError(message, 'SERVER_ERROR', 503)
   }
 
-  const result = await provider.add({ productName: product.name })
+  let result
+  try {
+    result = await provider.add({ productName: product.name })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Failed to add to list provider'
+    return apiError(message, 'SERVER_ERROR', 502)
+  }
 
   // Store in local SQLite as a display cache (preserves imageUrl and product details)
   await db.shoppingListItem.upsert({

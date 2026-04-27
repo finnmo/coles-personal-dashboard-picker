@@ -1,11 +1,11 @@
 import type { ListProvider, AddItemRequest, AddItemResponse, ListItem } from './types'
 
-const BASE_URL = 'https://api.todoist.com/rest/v2'
+const BASE_URL = 'https://api.todoist.com/api/v1'
 
 interface TodoistTask {
   id: string
   content: string
-  is_completed: boolean
+  checked: boolean
 }
 
 export class TodoistProvider implements ListProvider {
@@ -54,8 +54,10 @@ export class TodoistProvider implements ListProvider {
       throw new Error(`Todoist list failed: ${res.status} ${await res.text()}`)
     }
 
-    const tasks: TodoistTask[] = await res.json()
-    return tasks.filter((t) => !t.is_completed).map((t) => ({ taskId: t.id, title: t.content }))
+    const body: { results: TodoistTask[] } = await res.json()
+    return (body.results ?? [])
+      .filter((t) => !t.checked)
+      .map((t) => ({ taskId: t.id, title: t.content }))
   }
 
   async complete(taskId: string): Promise<void> {
