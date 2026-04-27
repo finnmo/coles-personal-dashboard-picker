@@ -23,6 +23,7 @@
 * **release:** switch to TriPSs/conventional-changelog-action to avoid broken CLI ([1598ee8](https://github.com/finnmo/coles-personal-dashboard-picker/commit/1598ee816c040e3cb6050534ba2444dd5e2aa752))
 * remove auth remnants from entrypoint and Dockerfile ([4f95fab](https://github.com/finnmo/coles-personal-dashboard-picker/commit/4f95fabb1f8390f5877a1feda2f2e0cc4b14583a))
 * skip changelog action gracefully when nothing to commit ([f138858](https://github.com/finnmo/coles-personal-dashboard-picker/commit/f1388584d8409e8510e4e143b8f26895ceed1e02))
+* update Todoist provider to API v1, add project listing script ([58c7651](https://github.com/finnmo/coles-personal-dashboard-picker/commit/58c7651dab8e8b5cf9e8338595ae9af07c8f5c83))
 * use Host header for login redirects to avoid Docker 0.0.0.0 address ([4df3191](https://github.com/finnmo/coles-personal-dashboard-picker/commit/4df31911f90a71e78c8b7765731fef968da6117e))
 
 
