@@ -50,8 +50,48 @@ export async function GET() {
     },
   })
 
+  // Inbound sync: tasks added on mobile that we haven't seen before
+  const knownRows = await db.shoppingListItem.findMany({
+    where: { googleTaskId: { not: null } },
+    select: { googleTaskId: true },
+  })
+  const knownTaskIds = new Set(knownRows.map((r) => r.googleTaskId!))
+  const newTasks = liveTasks.filter((t) => !knownTaskIds.has(t.taskId))
+
+  const newItems: { id: string; name: string }[] = []
+
+  if (newTasks.length > 0) {
+    const allProducts = await db.product.findMany({
+      where: { deletedAt: null },
+      select: { id: true, name: true },
+    })
+
+    for (const task of newTasks) {
+      const title = task.title.trim()
+      if (!title) continue
+
+      const titleLower = title.toLowerCase()
+      let product = allProducts.find((p) => p.name.toLowerCase() === titleLower) ?? null
+
+      if (!product) {
+        product = await db.product.create({ data: { name: title } })
+        allProducts.push(product)
+      }
+
+      const existing = await db.shoppingListItem.findUnique({
+        where: { productId: product.id },
+      })
+      if (existing) continue
+
+      await db.shoppingListItem.create({
+        data: { productId: product.id, googleTaskId: task.taskId },
+      })
+      newItems.push({ id: product.id, name: product.name })
+    }
+  }
+
   const items = await localItems()
-  return apiOk({ items, synced: true })
+  return apiOk({ items, synced: true, newItems })
 }
 
 /**

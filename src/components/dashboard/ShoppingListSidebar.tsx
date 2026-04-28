@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import Image from 'next/image'
-import useSWR from 'swr'
+import useSWR, { useSWRConfig } from 'swr'
 import { Trash2, Share2, AlignLeft, Smartphone, ChevronLeft, Check } from 'lucide-react'
 import { QrCode } from './QrCode'
 
@@ -23,6 +23,7 @@ type ListResponse = {
   items: ShoppingListItemData[]
   synced?: boolean
   error?: string
+  newItems?: { id: string; name: string }[]
 }
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json())
@@ -278,15 +279,25 @@ function ShareModal({ items, onClose }: ShareModalProps) {
 
 export function ShoppingListSidebar() {
   const [showShare, setShowShare] = useState(false)
+  const [syncedNames, setSyncedNames] = useState<string[]>([])
+  const { mutate: globalMutate } = useSWRConfig()
 
   const { data, mutate } = useSWR<ListResponse>('/api/shopping-list', fetcher, {
-    // Poll every 30 seconds so items checked off in Google Tasks app appear automatically
     refreshInterval: 30_000,
     revalidateOnFocus: true,
   })
 
+  // When the poll returns new externally-added items, notify and refresh the product grid
+  useEffect(() => {
+    if (!data?.newItems?.length) return
+    setSyncedNames(data.newItems.map((i) => i.name))
+    globalMutate('/api/products')
+    const t = setTimeout(() => setSyncedNames([]), 5_000)
+    return () => clearTimeout(t)
+  }, [data?.newItems, globalMutate])
+
   const items = data?.items ?? []
-  const syncError = data?.error === 'google_tasks_unavailable'
+  const syncError = data?.error === 'provider_unavailable'
 
   async function removeItem(itemId: string) {
     // Optimistic update
@@ -317,7 +328,7 @@ export function ShoppingListSidebar() {
             Shopping List
           </h2>
           {syncError && (
-            <p className="text-xs text-amber-500 mt-0.5">Google Tasks offline — showing cache</p>
+            <p className="text-xs text-amber-500 mt-0.5">List provider offline — showing cache</p>
           )}
         </div>
         <div className="flex items-center space-x-1">
@@ -344,6 +355,13 @@ export function ShoppingListSidebar() {
         </div>
       </div>
 
+      {/* Inbound sync toast */}
+      {syncedNames.length > 0 && (
+        <div className="mx-3 mt-2 rounded-lg bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 px-3 py-2 text-xs text-green-700 dark:text-green-300">
+          Added from your list: <span className="font-medium">{syncedNames.join(', ')}</span>
+        </div>
+      )}
+
       {/* List */}
       <div className="flex-1 overflow-y-auto px-3">
         {items.length === 0 ? (
@@ -366,9 +384,7 @@ export function ShoppingListSidebar() {
         <div className="border-t border-border px-4 py-2">
           <p className="text-xs text-muted-foreground">
             {items.length} item{items.length !== 1 ? 's' : ''}
-            {data?.synced && (
-              <span className="ml-2 text-green-600">· synced with Google Tasks</span>
-            )}
+            {data?.synced && <span className="ml-2 text-green-600">· synced</span>}
           </p>
         </div>
       )}
