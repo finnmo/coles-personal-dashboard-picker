@@ -1,4 +1,4 @@
-# 0.1.0 (2026-04-27)
+# 0.1.0 (2026-04-28)
 
 
 ### Bug Fixes
@@ -40,6 +40,7 @@
 * **docker:** add prisma CLI copy to runner stage ([0fbfc99](https://github.com/finnmo/coles-personal-dashboard-picker/commit/0fbfc9903343ba9d1ed888598f75108aa957aa20))
 * google tasks sync and always-visible shopping list sidebar ([305ca7c](https://github.com/finnmo/coles-personal-dashboard-picker/commit/305ca7c518c0ab0bd359e4e883df28831697b1c3))
 * **images:** fetch Coles image on product add, switch OFF to search service ([c763827](https://github.com/finnmo/coles-personal-dashboard-picker/commit/c76382738e36f2511e18937199b40ae1884194b0))
+* inbound sync from Todoist — tasks added on mobile appear on dashboard ([cf466a6](https://github.com/finnmo/coles-personal-dashboard-picker/commit/cf466a62e535c2c42ba8791a02e070794ce756aa))
 * initial project scaffolding (feat/project-setup) ([46a602b](https://github.com/finnmo/coles-personal-dashboard-picker/commit/46a602b26b34ad32de23b61d3dd97d1037cd6ae0))
 * **list:** apple Reminders integration via iOS Shortcuts URL scheme ([d0552f0](https://github.com/finnmo/coles-personal-dashboard-picker/commit/d0552f071da929f2978ffbe8931df81eecddaca5))
 * **list:** google Tasks integration with OAuth2 and google_keep fallback ([07a7d0a](https://github.com/finnmo/coles-personal-dashboard-picker/commit/07a7d0ab076f5f6defe616448f0fd06a89402a6e))
